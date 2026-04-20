@@ -29,27 +29,46 @@ jobs:
       - name: Fetch latest draw
         run: python -m backend.src.scraper.fetch_history
 
-      - name: Render charts (before evaluate notify)
-        run: python -m backend.src.export.chart
+      # --- 1) 评估（仅入库，不推送） ---
+      - name: Evaluate (db only)
+        id: eval
+        run: python -m backend.src.tasks.evaluate --no-notify --print-evaluated-issue
 
-      - name: Commit charts before notify
+      # --- 2) 渲染图表（针对已评估期号） ---
+      - name: Render charts
+        env:
+          EVAL_ISSUE: ${{ steps.eval.outputs.evaluated_issue }}
+        run: |
+          ARGS=""
+          if [ -n "$EVAL_ISSUE" ]; then ARGS="$ARGS --evaluate-issue $EVAL_ISSUE"; fi
+          python -m backend.src.export.chart $ARGS
+
+      # --- 3) 先 commit 图 + db，确保 raw.githubusercontent 可访问 ---
+      - name: Commit charts + db (before notify)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(img): update charts"
-          file_pattern: data/img/*.png
+          commit_message: "chore(data): update db & charts before notify"
+          file_pattern: data/img/*.png data/*.db data/lstm_state.pt data/lstm_meta.json data/transformer_state.pt data/transformer_meta.json data/xgboost_probs.npz
 
-      - name: Evaluate predictions
+      # --- 4) 等待 CDN ---
+      - name: Wait for CDN
+        run: sleep 8
+
+      # --- 5) 推送开奖通知 ---
+      - name: Notify evaluate
+        if: steps.eval.outputs.evaluated_issue != ''
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
           WEWORK_WEBHOOK: ${{ secrets.WEWORK_WEBHOOK }}
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-        run: python -m backend.src.tasks.evaluate
+        run: python -m backend.src.tasks.evaluate --notify-only --issue ${{ steps.eval.outputs.evaluated_issue }}
 
+      # --- 6) 导出 JSON 并 commit ---
       - name: Export JSON
         run: python -m backend.src.export.to_json
 
-      - name: Commit data
+      - name: Commit JSON
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): evaluate latest draw"
-          file_pattern: data/**/*.json data/*.db data/lstm_state.pt data/lstm_meta.json data/transformer_state.pt data/transformer_meta.json data/xgboost_probs.npz
+          commit_message: "chore(data): export json for frontend"
+          file_pattern: data/**/*.json

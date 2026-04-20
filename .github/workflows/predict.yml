@@ -30,34 +30,62 @@ jobs:
       - name: Fetch latest history
         run: python -m backend.src.scraper.fetch_history
 
-      - name: Evaluate previous predictions (in case missed)
+      # --- 1) 先评估上一期（仅入库，不推送） ---
+      - name: Evaluate previous predictions (db only)
+        id: eval
+        run: python -m backend.src.tasks.evaluate --no-notify --print-evaluated-issue
+
+      # --- 2) 生成本期预测（仅入库，不推送） ---
+      - name: Generate predictions (db only)
+        id: pred
+        run: python -m backend.src.tasks.predict --no-notify --print-issue
+
+      # --- 3) 渲染全部图表（包含本期预测汇总 + 上期开奖命中图） ---
+      - name: Render charts
         env:
-          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
-          WEWORK_WEBHOOK: ${{ secrets.WEWORK_WEBHOOK }}
-          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-        run: python -m backend.src.tasks.evaluate
+          PREDICT_ISSUE: ${{ steps.pred.outputs.issue }}
+          EVAL_ISSUE: ${{ steps.eval.outputs.evaluated_issue }}
+        run: |
+          ARGS=""
+          if [ -n "$PREDICT_ISSUE" ]; then ARGS="$ARGS --predict-issue $PREDICT_ISSUE"; fi
+          if [ -n "$EVAL_ISSUE" ]; then ARGS="$ARGS --evaluate-issue $EVAL_ISSUE"; fi
+          python -m backend.src.export.chart $ARGS
 
-      - name: Render charts (before prediction notify)
-        run: python -m backend.src.export.chart
-
-      - name: Commit charts before notify
+      # --- 4) 先把图和数据库一起 commit，确保 CDN 可访问 ---
+      - name: Commit charts + db (before notify)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(img): update charts"
-          file_pattern: data/img/*.png
+          commit_message: "chore(data): update db & charts before notify"
+          file_pattern: data/img/*.png data/*.db data/lstm_state.pt data/lstm_meta.json data/transformer_state.pt data/transformer_meta.json data/xgboost_probs.npz
 
-      - name: Generate new predictions
+      # --- 5) 等几秒让 raw.githubusercontent CDN 更新 ---
+      - name: Wait for CDN
+        run: sleep 8
+
+      # --- 6) 推送上期开奖通知 ---
+      - name: Notify evaluate (if any)
+        if: steps.eval.outputs.evaluated_issue != ''
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
           WEWORK_WEBHOOK: ${{ secrets.WEWORK_WEBHOOK }}
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-        run: python -m backend.src.tasks.predict
+        run: python -m backend.src.tasks.evaluate --notify-only --issue ${{ steps.eval.outputs.evaluated_issue }}
 
+      # --- 7) 推送本期预测通知 ---
+      - name: Notify predict
+        if: steps.pred.outputs.issue != ''
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          WEWORK_WEBHOOK: ${{ secrets.WEWORK_WEBHOOK }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: python -m backend.src.tasks.predict --notify-only --issue ${{ steps.pred.outputs.issue }}
+
+      # --- 8) 导出前端 JSON 并 commit ---
       - name: Export JSON for frontend
         run: python -m backend.src.export.to_json
 
-      - name: Commit data
+      - name: Commit JSON
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): auto-generate predictions"
-          file_pattern: data/**/*.json data/*.db data/lstm_state.pt data/lstm_meta.json data/transformer_state.pt data/transformer_meta.json data/xgboost_probs.npz
+          commit_message: "chore(data): export json for frontend"
+          file_pattern: data/**/*.json

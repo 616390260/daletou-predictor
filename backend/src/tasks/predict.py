@@ -5,11 +5,13 @@ from __future__ import annotations
 
 import argparse
 
-from ..config import DATA_DIR, MODEL_LABELS, MODELS, TICKETS_PER_DRAW
+from datetime import datetime, timedelta, timezone
+
+from ..config import DATA_DIR, MODELS, TICKETS_PER_DRAW
 from ..db import get_conn, init_db
 from ..models import get_model
 from ..utils.notifier import notify, repo_raw_url
-from ..utils.numbers import decode, encode
+from ..utils.numbers import encode
 from .dataio import load_history, next_issue_guess
 
 
@@ -24,12 +26,15 @@ def _existing_models_for_issue(issue: str) -> set[str]:
     return {r["model"] for r in rows}
 
 
-def run_predict(target_issue: str | None = None, force: bool = False) -> None:
+def run_predict(target_issue: str | None = None, force: bool = False,
+                notify_on_done: bool = True) -> str:
     """
     生成下一期预测
 
     @param target_issue 要预测的期号，默认自动推断为最新一期 +1
     @param force 是否覆盖已有预测
+    @param notify_on_done 完成后是否立即推送微信
+    @returns 本次预测的期号
     """
     init_db()
     history = load_history()
@@ -70,56 +75,116 @@ def run_predict(target_issue: str | None = None, force: bool = False) -> None:
             for idx, t in enumerate(tickets):
                 print(f"    注{idx + 1}: 前 {encode(t.front)}  后 {encode(t.back)}")
 
+    if notify_on_done:
+        _send_predict_notification(issue)
+    return issue
+
+
+def notify_predict(issue: str) -> None:
+    """
+    仅推送指定期号的预测通知（不重新生成预测）
+    """
     _send_predict_notification(issue)
+
+
+def _next_draw_text(issue: str) -> str:
+    """
+    根据期号猜下一期开奖时间（周一/三/六 20:30 北京时间）
+
+    @param issue 预测期号
+    @returns 形如 "2026-04-22 周三 20:30" 的字符串
+    """
+    tz = timezone(timedelta(hours=8))
+    now = datetime.now(tz)
+    for i in range(14):
+        d = now + timedelta(days=i)
+        if d.weekday() in (0, 2, 5):
+            target = d.replace(hour=20, minute=30, second=0, microsecond=0)
+            if target > now:
+                wd = "一二三四五六日"[d.weekday()]
+                return target.strftime(f"%Y-%m-%d 周{wd} %H:%M")
+    return ""
+
+
+def _count_predictions(issue: str) -> tuple[int, int]:
+    """
+    统计本期预测的模型数量与总注数
+
+    @returns (模型数, 总注数)
+    """
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT COUNT(DISTINCT model) AS m, COUNT(*) AS n "
+            "FROM predictions WHERE issue = ?",
+            (issue,),
+        ).fetchone()
+    return (row["m"] or 0, row["n"] or 0)
 
 
 def _send_predict_notification(issue: str) -> None:
     """
-    把本期全部模型的预测号码组装成 Markdown 发微信
+    推送本期预测：以汇总大图为主，文字极简
     """
-    lines = [f"# 🎰 大乐透 第 {issue} 期预测", ""]
-    with get_conn() as conn:
-        rows = conn.execute(
-            """
-            SELECT model, ticket_idx, front, back
-            FROM predictions WHERE issue = ?
-            ORDER BY model, ticket_idx
-            """,
-            (issue,),
-        ).fetchall()
+    n_models, n_tickets = _count_predictions(issue)
+    draw_at = _next_draw_text(issue)
 
-    buckets: dict[str, list] = {}
-    for r in rows:
-        buckets.setdefault(r["model"], []).append(r)
+    lines: list[str] = []
+    summary_img = DATA_DIR / "img" / f"predictions_{issue}.png"
+    if summary_img.exists():
+        url = repo_raw_url(f"data/img/predictions_{issue}.png")
+        if url:
+            lines.append(f"![predictions]({url})")
+            lines.append("")
 
-    for model in MODELS:
-        if model not in buckets:
-            continue
-        lines.append(f"### {MODEL_LABELS.get(model, model)}")
-        for r in sorted(buckets[model], key=lambda x: x["ticket_idx"]):
-            f_str = " ".join(f"`{n:02d}`" for n in decode(r["front"]))
-            b_str = " ".join(f"`{n:02d}`" for n in decode(r["back"]))
-            lines.append(f"- 注{r['ticket_idx'] + 1}：前 {f_str} | 后 {b_str}")
-        lines.append("")
+    lines.append("## 本期预测")
+    lines.append("")
+    lines.append("| 项目 | 内容 |")
+    lines.append("| --- | --- |")
+    lines.append(f"| 期号 | **{issue}** |")
+    if draw_at:
+        lines.append(f"| 开奖 | {draw_at} |")
+    lines.append(f"| 模型 | {n_models} 个 |")
+    lines.append(f"| 注数 | {n_tickets} 注 |")
+    lines.append("")
 
-    # 引用已提交到仓库的累计命中率图（由 workflow 在此之前生成并 commit）
     trend_img = DATA_DIR / "img" / "hit_trend.png"
     if trend_img.exists():
         url = repo_raw_url("data/img/hit_trend.png")
         if url:
-            lines.append("### 📈 各模型累计命中率")
+            lines.append("## 历史命中率")
             lines.append(f"![hit_trend]({url})")
             lines.append("")
 
     lines.append("---")
-    lines.append("📊 本预测仅供算法研究，理性购彩。")
+    lines.append("> 算法研究项目，仅供学习，请理性购彩 🙏")
 
-    notify(f"大乐透 {issue} 期预测", "\n".join(lines))
+    title = f"🎰 {issue} 期预测 · {n_tickets} 注"
+    notify(title, "\n".join(lines))
 
 
 if __name__ == "__main__":
+    import os
+
     parser = argparse.ArgumentParser(description="生成大乐透下一期预测")
     parser.add_argument("--issue", help="指定期号，默认自动 +1")
     parser.add_argument("--force", action="store_true", help="覆盖已有预测")
+    parser.add_argument("--no-notify", action="store_true",
+                        help="只入库不推送（供 workflow 分步使用）")
+    parser.add_argument("--notify-only", action="store_true",
+                        help="不重新预测，仅推送指定期号")
+    parser.add_argument("--print-issue", action="store_true",
+                        help="把本次预测的期号写入 GITHUB_OUTPUT / stdout")
     args = parser.parse_args()
-    run_predict(args.issue, args.force)
+    if args.notify_only:
+        if not args.issue:
+            raise SystemExit("--notify-only 需要同时指定 --issue")
+        notify_predict(args.issue)
+    else:
+        issue = run_predict(args.issue, args.force,
+                            notify_on_done=not args.no_notify)
+        if args.print_issue:
+            out = os.environ.get("GITHUB_OUTPUT")
+            if out:
+                with open(out, "a") as f:
+                    f.write(f"issue={issue}\n")
+            print(f"issue={issue}")
