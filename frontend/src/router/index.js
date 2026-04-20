@@ -3,6 +3,7 @@ import Home from "../views/Home.vue";
 import History from "../views/History.vue";
 import Predictions from "../views/Predictions.vue";
 import ModelCompare from "../views/ModelCompare.vue";
+import HitAnalysis from "../views/HitAnalysis.vue";
 import About from "../views/About.vue";
 
 /**
@@ -13,6 +14,7 @@ const routes = [
   { path: "/history", name: "history", component: History, meta: { title: "历史开奖" } },
   { path: "/predictions", name: "predictions", component: Predictions, meta: { title: "预测记录" } },
   { path: "/compare", name: "compare", component: ModelCompare, meta: { title: "模型对比" } },
+  { path: "/analysis", name: "analysis", component: HitAnalysis, meta: { title: "命中分析" } },
   { path: "/about", name: "about", component: About, meta: { title: "关于" } },
 ];
 

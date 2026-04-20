@@ -185,6 +185,13 @@
     </section>
 
     <section class="cta-grid">
+      <router-link to="/analysis" class="card cta">
+        <div>
+          <div class="cta-title">命中分析</div>
+          <div class="cta-desc">奖级分布 · 前后区热力 · 按期命中热力图</div>
+        </div>
+        <div class="cta-arrow">→</div>
+      </router-link>
       <router-link to="/compare" class="card cta">
         <div>
           <div class="cta-title">模型对比</div>
@@ -196,13 +203,6 @@
         <div>
           <div class="cta-title">预测记录</div>
           <div class="cta-desc">每期 9 模型 × 4 注号码及命中详情</div>
-        </div>
-        <div class="cta-arrow">→</div>
-      </router-link>
-      <router-link to="/history" class="card cta">
-        <div>
-          <div class="cta-title">历史开奖</div>
-          <div class="cta-desc">近 500 期完整号码 + 销量 + 奖池</div>
         </div>
         <div class="cta-arrow">→</div>
       </router-link>

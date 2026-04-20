@@ -29,6 +29,7 @@ const navs = [
   { to: "/", label: "首页" },
   { to: "/history", label: "历史开奖" },
   { to: "/predictions", label: "预测记录" },
+  { to: "/analysis", label: "命中分析" },
   { to: "/compare", label: "模型对比" },
   { to: "/about", label: "关于" },
 ];
