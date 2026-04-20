@@ -10,7 +10,7 @@
         让算法和 <span class="grad-red">概率</span> 掰手腕
       </h1>
       <p class="subtitle">
-        每期 9 个模型各投 4 注，开奖后透明公布命中率。<br />
+        每期 9 个模型各出 1 注，开奖后透明公布命中率。<br />
         <b>验证"预测"到底比随机强多少。</b>
       </p>
     </section>
@@ -202,7 +202,7 @@
       <router-link to="/predictions" class="card cta">
         <div>
           <div class="cta-title">预测记录</div>
-          <div class="cta-desc">每期 9 模型 × 4 注号码及命中详情</div>
+          <div class="cta-desc">每期 9 模型 × 1 注号码及命中详情</div>
         </div>
         <div class="cta-arrow">→</div>
       </router-link>

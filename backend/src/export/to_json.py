@@ -91,7 +91,7 @@ def export_frequency() -> None:
 
 def export_predictions(limit_issues: int = 50) -> None:
     """
-    导出最近若干期的预测记录（每期每模型 4 注 + 命中情况）
+    导出最近若干期的预测记录（每期每模型 TICKETS_PER_DRAW 注 + 命中情况）
     """
     with get_conn() as conn:
         issue_rows = conn.execute(

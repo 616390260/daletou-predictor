@@ -1,5 +1,5 @@
 """
-预测任务：读取历史数据 → 对每个模型生成 4 注投注 → 入库 predictions 表
+预测任务：读取历史数据 → 对每个模型生成 TICKETS_PER_DRAW 注投注 → 入库 predictions 表
 """
 from __future__ import annotations
 

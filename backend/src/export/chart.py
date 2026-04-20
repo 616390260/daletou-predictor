@@ -252,7 +252,7 @@ def _fetch_predictions(issue: str) -> Dict[str, List[dict]]:
 def render_predictions_summary(issue: str,
                                path: Optional[Path] = None) -> Optional[Path]:
     """
-    渲染本期全部模型预测汇总图（9 模型 × 4 注网格）
+    渲染本期全部模型预测汇总图（n 个模型 × m 注网格，m 由数据决定）
 
     @param issue 预测期号
     @returns 图片路径；若无预测返回 None
@@ -263,14 +263,15 @@ def render_predictions_summary(issue: str,
 
     models = [m for m in MODELS if m in buckets]
     n_rows = len(models)
+    n_cols = max((len(buckets[m]) for m in models), default=1)
 
     label_w = 5.5
     ticket_w = 6.2
     ticket_gap = 0.9
-    total_w = label_w + 4 * ticket_w + 3 * ticket_gap
+    total_w = label_w + n_cols * ticket_w + max(n_cols - 1, 0) * ticket_gap
     row_h = 1.0
 
-    fig_w = 11.5
+    fig_w = min(11.5, 4.2 + n_cols * 3.2)
     fig_h = 0.9 + n_rows * 0.55 + 0.4
     path = path or (IMG_DIR / f"predictions_{issue}.png")
 
@@ -285,8 +286,9 @@ def render_predictions_summary(issue: str,
     ax.text(total_w / 2, -0.55, f"DaLeTou Predictions  ·  Issue {issue}",
             ha="center", va="center", color=_TEXT,
             fontsize=15, weight="bold")
+    ticket_word = "Ticket" if n_cols == 1 else "Tickets"
     ax.text(total_w / 2, -0.15,
-            f"{n_rows} Models  ×  4 Tickets   =   {n_rows * 4} combinations",
+            f"{n_rows} Models  ×  {n_cols} {ticket_word}   =   {n_rows * n_cols} combinations",
             ha="center", va="center", color=_MUTED, fontsize=9)
 
     for i, model in enumerate(models):
@@ -305,7 +307,7 @@ def render_predictions_summary(issue: str,
                 color=color, fontsize=11, weight="bold",
                 va="center", ha="left", zorder=2)
 
-        tickets = sorted(buckets[model], key=lambda t: t["ticket_idx"])[:4]
+        tickets = sorted(buckets[model], key=lambda t: t["ticket_idx"])[:n_cols]
         for j, t in enumerate(tickets):
             x0 = label_w + j * (ticket_w + ticket_gap)
             _draw_ticket(ax, x0, y, t["front"], t["back"])
@@ -320,7 +322,7 @@ def render_predictions_summary(issue: str,
 def render_evaluate_summary(issue: str,
                             path: Optional[Path] = None) -> Optional[Path]:
     """
-    渲染开奖命中汇总图：顶部开奖球，下方每模型 4 注并高亮命中号码
+    渲染开奖命中汇总图：顶部开奖球，下方每模型 m 注并高亮命中号码
 
     @param issue 刚开奖的期号
     """
@@ -342,15 +344,16 @@ def render_evaluate_summary(issue: str,
 
     models = [m for m in MODELS if m in buckets]
     n_rows = len(models)
+    n_cols = max((len(buckets[m]) for m in models), default=1)
 
     label_w = 5.5
     ticket_w = 6.2
     ticket_gap = 0.9
-    total_w = label_w + 4 * ticket_w + 3 * ticket_gap
+    total_w = label_w + n_cols * ticket_w + max(n_cols - 1, 0) * ticket_gap
     row_h = 1.0
     head_h = 3.2
 
-    fig_w = 11.5
+    fig_w = min(11.5, 4.2 + n_cols * 3.2)
     fig_h = head_h * 0.45 + 0.5 + n_rows * 0.55 + 0.4
     path = path or (IMG_DIR / f"evaluate_{issue}.png")
 
@@ -402,7 +405,7 @@ def render_evaluate_summary(issue: str,
             (-0.15, y - 0.4), 0.18, 0.85, color=color, zorder=1,
         ))
 
-        tickets = sorted(buckets[model], key=lambda t: t["ticket_idx"])[:4]
+        tickets = sorted(buckets[model], key=lambda t: t["ticket_idx"])[:n_cols]
         hit_cnt = 0
         for t in tickets:
             if set(t["front"]) & front_set or set(t["back"]) & back_set:
@@ -411,7 +414,8 @@ def render_evaluate_summary(issue: str,
         ax.text(0.3, y, _EN_LABELS.get(model, model),
                 color=color, fontsize=10.5, weight="bold",
                 va="center", ha="left", zorder=2)
-        ax.text(0.3, y + 0.28, f"{hit_cnt}/4 tickets hit",
+        status = f"{hit_cnt}/{n_cols} tickets hit" if n_cols > 1 else ("HIT" if hit_cnt else "MISS")
+        ax.text(0.3, y + 0.28, status,
                 color=_MUTED, fontsize=7.5,
                 va="center", ha="left", zorder=2)
 

@@ -120,7 +120,7 @@
 
       <!-- 4. 按期×模型 命中热力图 -->
       <section class="card">
-        <div class="card-title">每期每模型命中注数（越亮代表 4 注中越多）</div>
+        <div class="card-title">每期每模型命中注数（越亮代表中奖注数越多）</div>
         <v-chart class="chart chart-heatmap" :option="issueModelHeatOption" autoresize />
       </section>
 
@@ -514,7 +514,7 @@ const hitMatrixOption = computed(() => {
 });
 
 /**
- * 按期 × 模型 命中热力图：格子值 = 该期该模型 4 注中奖注数
+ * 按期 × 模型 命中热力图：格子值 = 该期该模型中奖注数
  */
 const issueModelHeatOption = computed(() => {
   const issuesSorted = [...evaluatedIssues.value].sort((a, b) =>
@@ -539,7 +539,7 @@ const issueModelHeatOption = computed(() => {
         const issue = issuesSorted[p.data[0]]?.issue;
         const model = modelOrder[p.data[1]];
         const label = MODEL_LABELS[model] || model;
-        return `${label} · 第 ${issue} 期<br/>中奖 <b>${p.data[2]}</b>/4 注`;
+        return `${label} · 第 ${issue} 期<br/>中奖 <b>${p.data[2]}</b> 注`;
       },
     },
     grid: { left: 120, right: 30, top: 30, bottom: 60, containLabel: true },

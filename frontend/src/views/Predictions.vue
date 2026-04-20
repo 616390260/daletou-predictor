@@ -2,7 +2,7 @@
   <div class="container">
     <div class="page-head">
       <h1>预测记录</h1>
-      <p>每期每个模型给出 4 注投注。绿圈 = 命中号码，未开奖期标记为"待开奖"。</p>
+      <p>每期每个模型给出 1 注投注。绿圈 = 命中号码，未开奖期标记为"待开奖"。</p>
     </div>
 
     <div v-if="!items.length" class="loading">加载中…</div>
