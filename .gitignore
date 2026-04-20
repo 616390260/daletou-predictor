@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# 保留 data/daletou.db（历史开奖）、data/lstm_state.pt（LSTM 权重）、data/lstm_meta.json
+# data/export/ 下 JSON 也入库，前端部署时直接复制
+# 只忽略临时/旧版权重文件
+data/*.bak
+data/*.tmp
+data/lstm_*_cache.pt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# 本地私密配置（通知 SendKey 等走环境变量，不入库）
+.env
+.env.local
