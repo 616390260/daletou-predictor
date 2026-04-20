@@ -33,11 +33,11 @@ def _write_json(name: str, data: Any) -> None:
     print(f"已导出 {path}  ({path.stat().st_size / 1024:.1f} KB)")
 
 
-def export_history(limit: int = 500) -> None:
+def export_history(limit: int = 10000) -> None:
     """
     导出历史开奖记录
 
-    @param limit 导出最新 N 期（前端够用，全部太大）
+    @param limit 导出最新 N 期（默认 10000，即全量；当前历史约 2800+ 期约 230KB，浏览器可接受）
     """
     with get_conn() as conn:
         rows = conn.execute(
