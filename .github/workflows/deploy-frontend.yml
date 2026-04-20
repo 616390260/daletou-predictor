@@ -45,6 +45,8 @@ jobs:
 
       - name: Build
         working-directory: frontend
+        env:
+          VITE_BASE: /daletou-predictor/
         run: npm run build
 
       - name: Configure Pages
