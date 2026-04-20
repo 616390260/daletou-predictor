@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import argparse
 
-from ..config import MODEL_LABELS, MODELS, TICKETS_PER_DRAW
+from ..config import DATA_DIR, MODEL_LABELS, MODELS, TICKETS_PER_DRAW
 from ..db import get_conn, init_db
 from ..models import get_model
-from ..utils.notifier import notify
+from ..utils.notifier import notify, repo_raw_url
 from ..utils.numbers import decode, encode
 from .dataio import load_history, next_issue_guess
 
@@ -101,6 +101,15 @@ def _send_predict_notification(issue: str) -> None:
             b_str = " ".join(f"`{n:02d}`" for n in decode(r["back"]))
             lines.append(f"- 注{r['ticket_idx'] + 1}：前 {f_str} | 后 {b_str}")
         lines.append("")
+
+    # 引用已提交到仓库的累计命中率图（由 workflow 在此之前生成并 commit）
+    trend_img = DATA_DIR / "img" / "hit_trend.png"
+    if trend_img.exists():
+        url = repo_raw_url("data/img/hit_trend.png")
+        if url:
+            lines.append("### 📈 各模型累计命中率")
+            lines.append(f"![hit_trend]({url})")
+            lines.append("")
 
     lines.append("---")
     lines.append("📊 本预测仅供算法研究，理性购彩。")

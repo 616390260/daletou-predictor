@@ -11,21 +11,35 @@
 from __future__ import annotations
 
 import os
-from typing import List
+from typing import List, Optional
 
 import requests
 
 
+def repo_raw_url(rel_path: str) -> Optional[str]:
+    """
+    把 repo 内相对路径（如 data/img/xxx.png）转为 raw.githubusercontent.com URL
+
+    @param rel_path 相对仓库根目录的文件路径
+    @returns URL 字符串；若环境变量 GITHUB_REPOSITORY 不存在返回 None
+    """
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    branch = os.environ.get("GITHUB_REF_NAME", "main")
+    if not repo:
+        return None
+    return f"https://raw.githubusercontent.com/{repo}/{branch}/{rel_path.lstrip('/')}"
+
+
 def _send_serverchan(title: str, content: str, sendkey: str) -> bool:
     """
-    Server 酱推送
+    Server 酱推送（Markdown，支持图片 URL）
     """
     url = f"https://sctapi.ftqq.com/{sendkey}.send"
     try:
         resp = requests.post(
             url,
             data={"title": title[:32], "desp": content},
-            timeout=10,
+            timeout=15,
         )
         ok = resp.status_code == 200 and resp.json().get("code") == 0
         if not ok:

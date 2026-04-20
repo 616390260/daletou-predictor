@@ -31,7 +31,20 @@ jobs:
         run: python -m backend.src.scraper.fetch_history
 
       - name: Evaluate previous predictions (in case missed)
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          WEWORK_WEBHOOK: ${{ secrets.WEWORK_WEBHOOK }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
         run: python -m backend.src.tasks.evaluate
+
+      - name: Render charts (before prediction notify)
+        run: python -m backend.src.export.chart
+
+      - name: Commit charts before notify
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(img): update charts"
+          file_pattern: data/img/*.png
 
       - name: Generate new predictions
         env:
@@ -47,4 +60,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(data): auto-generate predictions"
-          file_pattern: data/**/*.json data/*.db data/lstm_state.pt data/lstm_meta.json
+          file_pattern: data/**/*.json data/*.db data/lstm_state.pt data/lstm_meta.json data/transformer_state.pt data/transformer_meta.json data/xgboost_probs.npz

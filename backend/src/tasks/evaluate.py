@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import argparse
 
-from ..config import MODEL_LABELS, MODELS, PRIZE_TABLE, TICKET_PRICE
+from ..config import DATA_DIR, MODEL_LABELS, MODELS, PRIZE_TABLE, TICKET_PRICE
 from ..db import get_conn, init_db
-from ..utils.notifier import notify
+from ..utils.notifier import notify, repo_raw_url
 from ..utils.numbers import count_hits, decode
 
 
@@ -89,8 +89,17 @@ def _send_evaluate_notification(issue: str) -> None:
         f"**日期**：{draw['draw_date']}",
         f"**开奖号**：前 {real_front} | 后 {real_back}",
         "",
-        "### 模型命中汇总",
     ]
+
+    # 引用已 commit 的号码球图（workflow 在此之前生成并 push）
+    draw_img = DATA_DIR / "img" / f"draw_{issue}.png"
+    if draw_img.exists():
+        url = repo_raw_url(f"data/img/{draw_img.name}")
+        if url:
+            lines.append(f"![draw]({url})")
+            lines.append("")
+
+    lines.append("### 模型命中汇总")
 
     stat_map = {r["model"]: r for r in rows}
     total_cost_all = 0
@@ -118,9 +127,18 @@ def _send_evaluate_notification(issue: str) -> None:
         f"**总计**：投入 ¥{total_cost_all}，回报 ¥{total_prize_all}，"
         f"ROI {roi * 100:.1f}%",
         "",
-        "---",
-        "📈 详情见模型对比页。",
     ]
+
+    trend_img = DATA_DIR / "img" / "hit_trend.png"
+    if trend_img.exists():
+        url = repo_raw_url("data/img/hit_trend.png")
+        if url:
+            lines.append("### 📈 累计命中率曲线")
+            lines.append(f"![hit_trend]({url})")
+            lines.append("")
+
+    lines.append("---")
+    lines.append("📈 详情见模型对比页。")
     notify(f"大乐透 {issue} 期开奖速递", "\n".join(lines))
 
 
