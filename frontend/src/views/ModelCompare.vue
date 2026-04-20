@@ -5,7 +5,19 @@
       <p>多模型长期命中率、投入产出比、号码频次热力图。</p>
     </div>
 
-    <div v-if="!stats.summary.length" class="loading">加载中…</div>
+    <div v-if="loading" class="empty-state">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-title">正在加载数据…</div>
+    </div>
+
+    <div v-else-if="!stats.summary.length" class="empty-state">
+      <div class="empty-icon">📊</div>
+      <div class="empty-title">尚无评估数据</div>
+      <div class="empty-desc">
+        每期开奖后（周一/三/六 22:30 自动评估），本页将自动展示各模型命中率、ROI、冷热号。<br />
+        目前本期预测可在 <router-link to="/predictions">预测记录</router-link> 页面查看。
+      </div>
+    </div>
 
     <template v-else>
       <div class="card">
@@ -93,6 +105,7 @@ use([
 
 const stats = ref({ summary: [], trend: {} });
 const frequency = ref(null);
+const loading = ref(true);
 
 import { MODEL_COLORS, MODEL_LABELS } from "../api/models";
 
@@ -309,8 +322,13 @@ const freqChartOption = computed(() => {
 });
 
 onMounted(async () => {
-  stats.value = (await api.stats()) || { summary: [], trend: {} };
-  frequency.value = await api.frequency();
+  try {
+    const [s, f] = await Promise.all([api.stats(), api.frequency()]);
+    stats.value = s || { summary: [], trend: {} };
+    frequency.value = f;
+  } finally {
+    loading.value = false;
+  }
 });
 </script>
 
@@ -377,5 +395,36 @@ onMounted(async () => {
 
 .heat-chart {
   height: 400px;
+}
+
+.empty-state {
+  padding: 64px 24px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.015);
+}
+.empty-icon {
+  font-size: 44px;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 8px;
+}
+.empty-desc {
+  font-size: 13px;
+  color: var(--text-3);
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.empty-desc a {
+  color: var(--text-1);
+  text-decoration: underline;
+  text-decoration-color: var(--border);
 }
 </style>

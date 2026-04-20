@@ -66,6 +66,64 @@
       </div>
     </section>
 
+    <!-- 上期命中回顾 -->
+    <section class="card" v-if="lastReview">
+      <div class="section-title">
+        <h2>上期命中回顾 · 第 {{ lastReview.issue }} 期</h2>
+        <router-link to="/predictions" class="see-all">全部记录 →</router-link>
+      </div>
+      <div class="review-head">
+        <div class="review-actual">
+          <div class="card-label">实际开奖</div>
+          <BallRow :front="lastReview.real.front" :back="lastReview.real.back" size="md" />
+        </div>
+        <div class="review-summary">
+          <div>
+            <div class="kpi-val" :class="lastReview.winModels > 0 ? 'up' : 'down'">
+              {{ lastReview.winModels }}<small>/{{ lastReview.totalModels }}</small>
+            </div>
+            <div class="kpi-label">中奖模型</div>
+          </div>
+          <div>
+            <div class="kpi-val">{{ lastReview.winTickets }}<small>/{{ lastReview.totalTickets }}</small></div>
+            <div class="kpi-label">中奖注数</div>
+          </div>
+          <div>
+            <div class="kpi-val" :class="lastReview.roi >= 0 ? 'up' : 'down'">
+              {{ (lastReview.roi * 100).toFixed(0) }}<small>%</small>
+            </div>
+            <div class="kpi-label">本期 ROI</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-grid">
+        <div
+          class="review-tile"
+          v-for="m in lastReview.models"
+          :key="m.model"
+          :class="{ 'is-win': m.winTickets > 0 }"
+        >
+          <div class="review-tile-head">
+            <span class="model-badge" :data-model="m.model">{{ m.label }}</span>
+            <span class="review-tag" :class="m.winTickets > 0 ? 'up' : 'down'">
+              {{ m.winTickets }}/{{ m.tickets.length }}
+            </span>
+          </div>
+          <div class="review-tile-tickets">
+            <BallRow
+              v-for="t in m.tickets"
+              :key="t.idx"
+              :front="t.front"
+              :back="t.back"
+              :hit-front="lastReview.real.front"
+              :hit-back="lastReview.real.back"
+              size="xs"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 本期预测概览 -->
     <section class="card" v-if="nextPrediction">
       <div class="section-title">
@@ -172,6 +230,35 @@ const nextPrediction = computed(() => {
   const issue = meta.value?.predicting_issue;
   const target = predictions.value.find((p) => p.issue === issue) || predictions.value[0];
   return target;
+});
+
+const lastReview = computed(() => {
+  const item = predictions.value.find(
+    (p) => p.real && p.models.some((m) => m.tickets.some((t) => t.result)),
+  );
+  if (!item) return null;
+  const models = item.models.map((m) => {
+    const winTickets = m.tickets.filter((t) => t.result && t.result.amount > 0).length;
+    return { ...m, winTickets };
+  });
+  const totalTickets = models.reduce((s, m) => s + m.tickets.length, 0);
+  const winTickets = models.reduce((s, m) => s + m.winTickets, 0);
+  const winModels = models.filter((m) => m.winTickets > 0).length;
+  const cost = totalTickets * 2;
+  const prize = models.reduce(
+    (s, m) => s + m.tickets.reduce((ss, t) => ss + (t.result?.amount || 0), 0),
+    0,
+  );
+  return {
+    issue: item.issue,
+    real: item.real,
+    models,
+    totalModels: models.length,
+    winModels,
+    totalTickets,
+    winTickets,
+    roi: cost ? (prize - cost) / cost : 0,
+  };
 });
 
 const totalStats = computed(() => {
@@ -399,6 +486,78 @@ onBeforeUnmount(() => {
   color: var(--text-3);
   margin-top: 4px;
   letter-spacing: 0.04em;
+}
+
+/* 上期命中回顾 */
+.review-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 16px;
+}
+
+.review-actual .card-label {
+  margin-bottom: 8px;
+}
+
+.review-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  text-align: center;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.review-tile {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+.review-tile.is-win {
+  border-color: rgba(250, 204, 21, 0.5);
+  background: rgba(250, 204, 21, 0.06);
+}
+
+.review-tile-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-tag {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.review-tag.up { background: rgba(250, 204, 21, 0.18); color: #fde68a; }
+.review-tag.down { color: var(--text-3); }
+
+.review-tile-tickets {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+@media (max-width: 640px) {
+  .review-head {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* 本期预测 */
