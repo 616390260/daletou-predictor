@@ -261,6 +261,37 @@ def export_stats() -> None:
     _write_json("stats.json", {"summary": stats, "trend": trend, "hit_trend": hit_trend})
 
 
+def _next_draw_time(latest_date_str: str | None) -> str | None:
+    """
+    估算下一次大乐透开奖时间（北京时间周一/三/六 20:30）
+
+    @param latest_date_str 最新一期开奖日期 YYYY-MM-DD
+    @returns ISO 字符串（UTC+8 时区）
+    """
+    from datetime import datetime, timedelta, timezone
+
+    tz = timezone(timedelta(hours=8))
+    now = datetime.now(tz)
+    if latest_date_str:
+        try:
+            base = datetime.strptime(latest_date_str, "%Y-%m-%d").replace(
+                hour=20, minute=30, tzinfo=tz
+            )
+            now = max(now, base + timedelta(minutes=1))
+        except Exception:
+            pass
+    # 大乐透：周一=0 / 周三=2 / 周六=5
+    draw_weekdays = {0, 2, 5}
+    for offset in range(0, 8):
+        candidate = now + timedelta(days=offset)
+        candidate = candidate.replace(hour=20, minute=30, second=0, microsecond=0)
+        if candidate < now:
+            continue
+        if candidate.weekday() in draw_weekdays:
+            return candidate.isoformat()
+    return None
+
+
 def export_meta() -> None:
     """
     导出元信息（最后更新时间、总数等），给前端展示数据新鲜度
@@ -274,12 +305,19 @@ def export_meta() -> None:
         ).fetchone()
         preds = conn.execute("SELECT COUNT(*) c FROM predictions").fetchone()["c"]
         results = conn.execute("SELECT COUNT(*) c FROM results").fetchone()["c"]
+        next_pred = conn.execute(
+            "SELECT issue FROM predictions ORDER BY issue DESC LIMIT 1"
+        ).fetchone()
 
+    latest_issue = latest["issue"] if latest else None
+    latest_date = latest["draw_date"] if latest else None
     meta = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "total_draws": draws,
-        "latest_issue": latest["issue"] if latest else None,
-        "latest_date": latest["draw_date"] if latest else None,
+        "latest_issue": latest_issue,
+        "latest_date": latest_date,
+        "next_draw_at": _next_draw_time(latest_date),
+        "predicting_issue": next_pred["issue"] if next_pred else None,
         "total_predictions": preds,
         "total_results": results,
         "tickets_per_draw": TICKETS_PER_DRAW,

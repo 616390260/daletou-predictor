@@ -18,7 +18,7 @@
             </div>
             <div v-if="item.real" class="real-row">
               <span class="real-label">真实开奖</span>
-              <BallRow :front="item.real.front" :back="item.real.back" sm />
+              <BallRow :front="item.real.front" :back="item.real.back" size="sm" />
             </div>
           </div>
         </header>
@@ -37,7 +37,7 @@
                   :back="t.back"
                   :hit-front="item.real?.front || []"
                   :hit-back="item.real?.back || []"
-                  sm
+                  size="sm"
                 />
                 <span v-if="t.result" class="result" :class="{ win: t.result.amount > 0 }">
                   {{ t.result.level || "未中奖" }}

@@ -250,6 +250,30 @@ button {
   flex-wrap: wrap;
 }
 
+/* 通过 data-size 控制球大小，兼容旧的 sm 类 */
+.num-ball-row[data-size="xs"] .num-ball {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+}
+.num-ball-row[data-size="sm"] .num-ball {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+}
+.num-ball-row[data-size="md"] .num-ball {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+.num-ball-row[data-size="lg"] .num-ball {
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+}
+.num-ball-row[data-size="xs"] { gap: 4px; }
+.num-ball-row[data-size="xs"] .num-ball-divider { margin: 0 2px; }
+
 .num-ball-divider {
   display: inline-block;
   width: 6px;

@@ -21,7 +21,7 @@
             <tr v-for="row in visibleRows" :key="row.issue">
               <td class="mono">{{ row.issue }}</td>
               <td class="mono">{{ row.date }}</td>
-              <td><BallRow :front="row.front" :back="row.back" sm /></td>
+              <td><BallRow :front="row.front" :back="row.back" size="sm" /></td>
               <td class="num mono">{{ fmt(row.sales) }}</td>
               <td class="num mono">{{ fmt(row.pool) }}</td>
             </tr>
