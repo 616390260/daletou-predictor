@@ -130,14 +130,16 @@ jobs:
           BACKTEST_OUTCOME: ${{ steps.backtest.outcome }}
         run: python -m backend.src.tasks.notify_backtest
 
-      - name: Auto-dispatch (backtest 接力 + predict/evaluate 窗口心跳)
+      - name: Auto-dispatch (backtest 接力 + evaluate 窗口心跳)
         # GitHub Actions 的 schedule 对这个 repo 基本失效（predict 0 次、evaluate 1 次/月），
-        # 所以把 predict/evaluate 的触发寄生到 backtest 的接力循环上：
-        #   - 每次 backtest 接力结束时，判断当前北京时间和星期几
-        #   - 命中"开奖日 + predict 窗口" → dispatch predict.yml
-        #   - 命中"开奖日 + evaluate 窗口" → dispatch evaluate.yml
-        #   - 无论 done 与否，都接力 backtest 自己（done=true 时也接力，做心跳用）
-        # 大乐透开奖时刻：周一/三/六 21:15；停售 20:00。
+        # 所以把 evaluate 的触发寄生到 backtest 的接力循环上：
+        #   - 每次 backtest 接力结束时，判断"当前是否开奖日 21:30 之后"
+        #   - 命中 → dispatch evaluate.yml
+        #   - evaluate 成功后自己会链式触发 predict.yml + backtest.yml（见 evaluate.yml 的 Chain step）
+        # 所以整个事件链：
+        #     开奖 → backtest 心跳命中 evaluate 窗口 → evaluate 入库+推送开奖通知
+        #           → predict 下一期+推送预测通知 + backtest 把新期纳入回测
+        # predict 不再由 backtest 触发（用户要的节奏是"开奖后才 predict"）
         if: always() && inputs.auto_continue == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -155,19 +157,14 @@ jobs:
           is_draw_day=false
           case "$dow" in 1|3|6) is_draw_day=true;; esac
 
-          # predict 窗口：开奖日北京 15:00-19:30（20:00 停售，留 30min 缓冲给 predict + CDN + 通知链路）
-          if [ "$is_draw_day" = "true" ] && [ "$now_bj" -ge "1500" ] && [ "$now_bj" -le "1930" ]; then
-            echo "[auto] ★ 命中 predict 窗口 (15:00-19:30)，dispatch predict.yml"
-            gh workflow run predict.yml --ref "$REF_NAME" 2>&1 || echo "[auto] predict dispatch 失败"
-          fi
-
           # evaluate 窗口：开奖日北京 21:30 及之后（21:15 开奖，留 15min 等官网出号）
+          # evaluate 本身幂等（SELECT 只选无 results 的期号），重复 dispatch 不会重复推送
           if [ "$is_draw_day" = "true" ] && [ "$now_bj" -ge "2130" ]; then
             echo "[auto] ★ 命中 evaluate 窗口 (>=21:30)，dispatch evaluate.yml"
             gh workflow run evaluate.yml --ref "$REF_NAME" 2>&1 || echo "[auto] evaluate dispatch 失败"
           fi
 
-          # --- backtest 自身接力 ---
+          # --- backtest 自身接力（心跳兼 bootstrap） ---
           if [ ! -f data/.backtest_state.json ]; then
             echo "[auto] state 文件不存在，跳过 backtest 续跑"
             exit 0
@@ -176,7 +173,7 @@ jobs:
           echo "[auto] backtest done=$DONE"
           sleep 5
           if [ "$DONE" = "true" ]; then
-            echo "[auto] backtest 已完成，仍接力作为心跳（下次接力时再次判断 predict/evaluate 窗口）"
+            echo "[auto] backtest 已完成，仍接力作为心跳（让 evaluate 窗口判断能持续执行）"
           else
             echo "[auto] backtest 未完成，接力下一轮继续 bootstrap"
           fi

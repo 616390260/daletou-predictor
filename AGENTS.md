@@ -126,6 +126,49 @@ with open(os.path.expanduser("~/.git-credentials")) as f:
 - **别把 token 拼进 shell 命令**，用 Python `urllib` + headers 发请求更安全（terminal log 会被其他工具读）。
 - **GitHub schedule 不可信**：predict.yml 单一 cron 从未按时触发过；evaluate.yml 延迟 81 min。解法是一个 workflow 配多个 cron 时间点 + 任务代码幂等，而不是押注单点。
 - **`Notify predict` step 出现 `skipped` 不代表故障**：这是幂等设计的**正确行为**。当 DB 里已经有当期所有 9 个模型的预测（通常是前一次 predict run 已经预测过这期），`predict.py` 会把 `any_new` 置为 False，不往 `GITHUB_OUTPUT` 写 `issue`，于是 Notify step 的 `if: steps.pred.outputs.issue` 判定为假，被跳过。**判断是否真的"漏发通知"的正确姿势**：先查 `predictions` 表同期覆盖度（`SELECT issue, COUNT(DISTINCT model) FROM predictions GROUP BY issue ORDER BY issue DESC LIMIT 5`），再查该期号更早的 workflow run 是否成功 Notify 过。覆盖度 = 9 且更早有成功 Notify → 幂等命中，一切正常，不要重复触发。
+- **GitHub schedule 几乎完全不工作**：这个 repo 的 predict.yml schedule 历史触发次数 = 0，evaluate.yml = 1。不能靠 cron 驱动业务。已改为事件链 + backtest 心跳触发，见下面"事件链"章节。
+
+## 事件链（核心调度模型）
+
+> **Do NOT 依赖 GitHub schedule 触发业务**。下面这个事件链是这个 repo 的心跳源。
+
+```
+[种子] backtest 接力循环（60min/轮，time_budget=3600）
+         ├─ 每轮结束判断：当前是开奖日 + 北京时间 ≥ 21:30 吗？
+         │     是 → dispatch evaluate.yml
+         │     否 → 只接力 backtest 自己
+         │
+         ↓ (开奖日晚 21:30+)
+     evaluate.yml：拉取最新开奖号入库 → 评估 9 模型命中 → 推送开奖通知
+         │
+         ├─ 评估到新期号（evaluated_issue != ""）时
+         │     → dispatch predict.yml（预测下一期）
+         │     → dispatch backtest.yml（把新期纳入 walk-forward）
+         │
+         ↓
+     predict.yml：LSTM/Transformer 增量训练 → 预测下一期 → 推送预测通知
+     backtest.yml：把新开奖那期 walk-forward 跑一遍（几分钟）
+```
+
+**为什么这么设计**：
+
+1. **predict 不抢 20:00 停售前的时间**。开奖 21:15 后，距下一次开奖约 46h，从容不迫。
+2. **不依赖 GitHub schedule**。靠 backtest 自续 dispatch（concurrency 排队+fail-safe 接力）持续产生心跳。
+3. **predict 不等 backtest 完成**。evaluate 触发 predict 和 backtest 是**并行**的——LSTM/Transformer 自己有增量训练，拿到最新 DB 就能预测。backtest 是评估工具，不是预测依赖。
+4. **每个环节都幂等**：evaluate 只处理无 results 的期，predict 只生成新期缺失的模型，backtest 只跑未跑过的 (issue, model)。心跳重复 dispatch 不会重复骚扰。
+
+**事件链的必要条件**：
+
+- `backtest.yml` 必须一直在心跳（哪怕 done=true 也接力）。如果心跳断了，evaluate 就不会被触发，事件链断开。
+- 心跳断了怎么恢复？任何时候手动 `gh workflow run backtest.yml` 一次，心跳就恢复了。
+
+**调试事件链**：
+
+```bash
+# 看最近 3 天所有 workflow run（包括 dispatch 源）
+gh run list --limit 50 --json name,event,createdAt,status,conclusion
+# 找事件链是否完整：evaluate 成功 → 应紧跟一个 workflow_dispatch 触发的 predict
+```
 
 ## AI 反思 Protocol（每次进入本 repo 必读）
 

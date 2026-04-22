@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: write  # 评估完成后要用 GITHUB_TOKEN dispatch predict.yml / backtest.yml
 
 jobs:
   evaluate:
@@ -87,3 +88,27 @@ jobs:
         with:
           commit_message: "chore(data): export json for frontend"
           file_pattern: data/**/*.json
+
+      # --- 7) 事件链：新一期评估完成 → 触发 predict 下一期 + backtest 把新数据纳入回测 ---
+      # 这就是用户要的节奏："开奖后评估 → 回测新期 → 预测下一期"。
+      # 从开奖到下一次停售 ~46h，极为从容，不用抢 20:00 前。
+      # predict 和 backtest 并行：
+      #   - predict.yml：LSTM/Transformer 增量训练 + 预测下一期 + 推送微信（~2-3min）
+      #   - backtest.yml：把刚开奖这一期纳入 walk-forward 回测，评估各模型命中情况
+      - name: Chain predict + backtest on new evaluation
+        if: steps.eval.outputs.evaluated_issue != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF_NAME: ${{ github.ref_name }}
+          EVAL_ISSUE: ${{ steps.eval.outputs.evaluated_issue }}
+        run: |
+          echo "[chain] 评估完成 issue=$EVAL_ISSUE，触发预测 + 回测"
+          sleep 3
+          gh workflow run predict.yml --ref "$REF_NAME" \
+            && echo "[chain] ✓ predict.yml 已 dispatch" \
+            || echo "[chain] ✗ predict.yml dispatch 失败"
+          gh workflow run backtest.yml --ref "$REF_NAME" \
+            -f start="-200" -f force=false -f models="all" \
+            -f auto_continue=true -f time_budget_seconds=3600 \
+            && echo "[chain] ✓ backtest.yml 已 dispatch" \
+            || echo "[chain] ✗ backtest.yml dispatch 失败"
