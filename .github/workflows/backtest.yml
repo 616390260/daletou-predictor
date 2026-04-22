@@ -147,7 +147,11 @@ jobs:
           DONE=$(python -c "import json,sys; sys.stdout.write(str(json.load(open('data/.backtest_state.json'))['done']).lower())")
           echo "[auto] done=$DONE"
           if [ "$DONE" = "true" ]; then
-            echo "[auto] backtest 已完成，无需续跑"
+            echo "[auto] backtest 已完成！顺手 dispatch 一次 predict.yml，让增量训练把 checkpoint 推到最新"
+            echo "[auto]   - 如果距开奖还远：刷新的 checkpoint 对下次定时 cron 有利"
+            echo "[auto]   - 如果 predict 已在当期幂等命中：不会重复骚扰用户"
+            sleep 5
+            gh workflow run predict.yml --ref "$REF_NAME" || echo "[auto] dispatch predict 失败，忽略（下次 cron 仍会触发）"
             exit 0
           fi
           echo "[auto] backtest 未完成，5s 后 dispatch 下一轮..."
