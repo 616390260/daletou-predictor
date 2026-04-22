@@ -1,0 +1,44 @@
+---
+description: AI 进入本 repo 时的反思 protocol；workflow / 回测 / 通知 / 数据 问题必触发
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# 反思 Protocol（Cursor Rule · 强制）
+
+本 repo 的 workflow 每次结束会自动追加一行到 `docs/RUN_LOG.jsonl`。你每次被召唤，**在回答用户问题之前**：
+
+## 1. 读最近 run 记录
+
+```bash
+tail -20 docs/RUN_LOG.jsonl
+```
+
+关注三个信号：
+- 同一 step 连续失败 ≥ 2 次 → **写入 `docs/KNOWN_ISSUES.md`**
+- `duration_s` 显著变长 → **提醒用户**
+- 新 outcome / 新字段 → **观察，暂不持久化**
+
+## 2. 沉淀可复用经验
+
+- 跨项目通用 pattern → 调 `user-memory` MCP 的 `add_observations` 到 `pattern:*` entity
+- 本项目约定变化 → 更新 `AGENTS.md` 对应章节
+- 不重复的偶发事件 → 只在回答里提一句，不做持久化
+
+## 3. 再回答原问题
+
+反思发现的问题如果**比用户的问题更紧急**（比如生产故障），先告知。
+
+## 禁止
+
+- ❌ 直接改代码不先读 `RUN_LOG.jsonl`
+- ❌ 每次都往 `AGENTS.md` / `KNOWN_ISSUES.md` 堆东西（只有 ≥ 2 次才值得沉淀）
+- ❌ 把猜测当根因写进 `KNOWN_ISSUES.md`（必须基于 RUN_LOG 证据）
+
+## 为什么
+
+`RUN_LOG.jsonl` 是事实层（机器写），`AGENTS.md / KNOWN_ISSUES / user-memory` 是知识层（AI 写）。
+事实 → 知识的转化发生在"用户召唤 AI"这个事件上，不需要外部定时任务、不需要 API key，靠文档约定即可闭环。
+
+完整细节见 `AGENTS.md` 的"AI 反思 Protocol"章节。

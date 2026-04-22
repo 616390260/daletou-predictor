@@ -57,12 +57,22 @@ jobs:
           if [ -n "$EVAL_ISSUE" ]; then ARGS="$ARGS --evaluate-issue $EVAL_ISSUE"; fi
           python -m backend.src.export.chart $ARGS
 
+      # --- 3.5) 追加结构化 run 记录（供 AI 反思） ---
+      - name: Append RUN_LOG.jsonl
+        if: always()
+        env:
+          PRED_ISSUE: ${{ steps.pred.outputs.issue }}
+          EVAL_ISSUE: ${{ steps.eval.outputs.evaluated_issue }}
+        run: |
+          EXTRA=$(python -c "import json,os; print(json.dumps({'predicted_issue':os.environ.get('PRED_ISSUE') or None,'evaluated_issue':os.environ.get('EVAL_ISSUE') or None}))")
+          python -m backend.src.utils.run_log --workflow predict --outcome "${{ job.status }}" --extra-json "$EXTRA"
+
       # --- 4) 先把图和数据库一起 commit，确保 CDN 可访问 ---
       - name: Commit charts + db (before notify)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(data): update db & charts before notify"
-          file_pattern: data/img/*.png data/*.db data/lstm_state.pt data/lstm_meta.json data/transformer_state.pt data/transformer_meta.json data/xgboost_probs.npz
+          file_pattern: data/img/*.png data/*.db data/lstm_state.pt data/lstm_meta.json data/transformer_state.pt data/transformer_meta.json data/xgboost_probs.npz docs/RUN_LOG.jsonl docs/RUN_LOG.archive.jsonl
 
       # --- 5) 等几秒让 raw.githubusercontent CDN 更新 ---
       - name: Wait for CDN

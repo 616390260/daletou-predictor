@@ -88,7 +88,22 @@ jobs:
         if: always()
         run: python -m backend.src.export.chart
 
-      - name: Commit progress (db + json + charts + state)
+      - name: Append RUN_LOG.jsonl (reflection substrate)
+        if: always()
+        env:
+          BACKTEST_OUTCOME: ${{ steps.backtest.outcome }}
+        run: |
+          # 把 .backtest_state.json 作为 extra 附到 run log，供下次 AI 反思时看到进度趋势
+          EXTRA_JSON="{}"
+          if [ -f data/.backtest_state.json ]; then
+            EXTRA_JSON=$(python -c "import json; s=json.load(open('data/.backtest_state.json')); print(json.dumps({k:s.get(k) for k in ['done','processed','total','last_issue','stopped_early']}))")
+          fi
+          python -m backend.src.utils.run_log \
+            --workflow backtest \
+            --outcome "$BACKTEST_OUTCOME" \
+            --extra-json "$EXTRA_JSON"
+
+      - name: Commit progress (db + json + charts + state + run log)
         if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -103,6 +118,8 @@ jobs:
             data/transformer_state.pt
             data/transformer_meta.json
             data/xgboost_probs.npz
+            docs/RUN_LOG.jsonl
+            docs/RUN_LOG.archive.jsonl
 
       - name: Notify progress / completion / failure
         if: always()

@@ -124,3 +124,67 @@ with open(os.path.expanduser("~/.git-credentials")) as f:
 - **workflow 里后置步骤一定要 `if: always()`**，否则 backtest 一旦超时被 GitHub kill，之前 5h+ 算的东西就因为没 commit 而全部丢失。这是这个项目踩过的最惨一次坑。
 - **改完 workflow 要测一次小数据**（比如 `start=-50`）再上全量，不然每次都等 5h 才知道 yml 写错了。
 - **别把 token 拼进 shell 命令**，用 Python `urllib` + headers 发请求更安全（terminal log 会被其他工具读）。
+- **GitHub schedule 不可信**：predict.yml 单一 cron 从未按时触发过；evaluate.yml 延迟 81 min。解法是一个 workflow 配多个 cron 时间点 + 任务代码幂等，而不是押注单点。
+
+## AI 反思 Protocol（每次进入本 repo 必读）
+
+> **这一节是给 AI（Cursor agent / Claude Code / 任何协作者）的强制性行为指引。**
+> 你每次被召唤进这个 repo 时，第一件事**不是**直接回答用户的问题，而是先完成反思环节。
+
+### 触发条件
+
+- 用户的问题与 workflow / backtest / predict / evaluate / 通知 / 数据 / 回测进度有关
+- 或者用户明显在"排查什么东西出问题了"
+- 或者是一个新 session 的第一轮对话
+
+以上任一成立时，**在回答前**执行以下步骤：
+
+### Step 1：读 `docs/RUN_LOG.jsonl` 最后 20 行
+
+这是所有 workflow run 的结构化记录（workflow 结束自动追加）。字段见 `backend/src/utils/run_log.py`。
+
+你要识别三种信号：
+
+1. **连续失败同一个 step** → 说明是系统性问题，不是偶发。读对应 run 的 logs（用 GitHub API，参考 `API 小抄` 一节），找根因。
+2. **性能退化**：同类 run 的 `duration_s` 显著变长（比如 backtest 单轮时间从 4h 变 8h）→ 可能是模型/数据变化或 runner 问题，值得提醒用户。
+3. **新的 outcome 模式**：出现从未见过的 outcome 或 extra 字段异常 → 说明有新变化，至少记一笔。
+
+### Step 2：决策是否需要升级经验
+
+基于 Step 1 的发现，决定：
+
+| 发现 | 动作 |
+|---|---|
+| 重复故障 ≥ 2 次 | 写/更新 `docs/KNOWN_ISSUES.md` 一条，含故障特征、根因、规避方式 |
+| 新的跨项目可复用 pattern | 调 `user-memory` MCP 的 `add_observations` 追加到 `pattern:*` 或新建 entity |
+| 本项目特有的约定变化 | 更新 `AGENTS.md` 对应章节 |
+| 仅当次偶发 | 不做任何持久化，只在回答里提一句 |
+
+### Step 3：再回答用户
+
+反思完了再回应用户原问题。如果反思发现的问题**比用户问的更重要**（比如用户问小事但你发现生产故障），**先告知**用户这个更紧急的发现。
+
+### 反例（不要这样）
+
+- ❌ 直接改代码不先读 RUN_LOG
+- ❌ 每次反思都往 AGENTS.md 堆内容（只有**重复出现 ≥ 2 次**的模式才值得沉淀）
+- ❌ 把猜测写进 KNOWN_ISSUES（必须基于 RUN_LOG 证据）
+
+### 用 jq 快速看最近状态
+
+```bash
+# 最近 20 条 run
+tail -20 docs/RUN_LOG.jsonl | jq '.'
+
+# 最近所有 failure
+grep '"outcome":"failure"' docs/RUN_LOG.jsonl | tail -10 | jq '.'
+
+# backtest 进度趋势
+grep '"workflow":"backtest"' docs/RUN_LOG.jsonl | jq '{ts, processed:.extra.processed, total:.extra.total}' | tail -10
+```
+
+### 为什么这么设计
+
+AI 的"进化"受限于模型权重不可改。能做的是**积累外部 context**，每次被召唤时加载回大脑。RUN_LOG 是事实层（workflow 自动写），AGENTS.md / KNOWN_ISSUES / user-memory 是知识层（AI 反思后写）。事实→知识的转化发生在"用户召唤 AI"这个事件上，不需要定时任务也不需要 API key，靠文档约定即可闭环。
+
+**换句话说：这个 repo 每多跑一次 workflow，积累的外部经验就多一份；下一次 AI 进来就更强一点。** 这是目前能做到的最接近"自主进化"的形态。
