@@ -57,6 +57,7 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Run walk-forward backtest (with time budget)
+        id: backtest
         env:
           ONLY_MODELS: ${{ inputs.models }}
           TIME_BUDGET: ${{ inputs.time_budget_seconds }}
@@ -102,6 +103,15 @@ jobs:
             data/transformer_state.pt
             data/transformer_meta.json
             data/xgboost_probs.npz
+
+      - name: Notify progress / completion / failure
+        if: always()
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          WEWORK_WEBHOOK: ${{ secrets.WEWORK_WEBHOOK }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          BACKTEST_OUTCOME: ${{ steps.backtest.outcome }}
+        run: python -m backend.src.tasks.notify_backtest
 
       - name: Auto-dispatch next run if not finished
         if: always() && inputs.auto_continue == 'true'
