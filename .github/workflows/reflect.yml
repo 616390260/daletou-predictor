@@ -1,0 +1,53 @@
+name: AI Reflect (auto)
+
+# 自动反思：读 docs/RUN_LOG.jsonl，按规则识别系统性问题，自动写入
+# docs/KNOWN_ISSUES.md 和 docs/AI_NOTES.md 反思日志。
+#
+# 设计：
+#   - 不调 LLM、不依赖 secret、不发通知（信噪比优先）
+#   - 触发：定时 + 三大业务 workflow 跑完后追加触发
+#   - 幂等：同一指纹已在 KNOWN_ISSUES 则跳过
+#   - 只追加文档变更，绝不动业务代码
+
+on:
+  schedule:
+    # 每 12 小时一次（多撞几个 cron 兜底，schedule 不可靠是已知事实）
+    - cron: "13 */12 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Walk-Forward Backtest", "Predict Next Draw", "Evaluate Draw Result"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reflect
+  cancel-in-progress: true
+
+jobs:
+  reflect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 拉最新 main，因为 RUN_LOG 是上一个 workflow 刚 commit 的
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run reflect.py
+        run: python -m backend.src.utils.reflect
+
+      - name: Commit AI reflections (if any change)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs(reflect): auto reflection from RUN_LOG"
+          file_pattern: |
+            docs/KNOWN_ISSUES.md
+            docs/AI_NOTES.md
