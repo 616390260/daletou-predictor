@@ -2,7 +2,7 @@
   <div class="container">
     <div class="page-head">
       <h1>模型对比</h1>
-      <p>多模型长期命中率、投入产出比、号码频次热力图。</p>
+      <p>多模型长期命中率、投入产出比、号码频次热力图。全库汇总含未核验的旧补算；统计判决请看方法论中的已核验区间。</p>
     </div>
 
     <div v-if="loading" class="empty-state">

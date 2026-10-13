@@ -1,281 +1,504 @@
 {
   "methodology": {
-    "name": "Walk-forward backtest + Binomial test",
-    "description": "对每个模型：每期只用此期之前的历史训练/拟合，单期单模型出 1 注预测；开奖后记录命中个数。汇总 N 期后，对号码命中事件做二项检验 (H0: 模型 ≡ 随机抽号)，并给出 Wilson 95% 置信区间。",
-    "theoretical_front": 0.142857,
-    "theoretical_back": 0.166667,
-    "significance_level": 0.05
+    "name": "Verified per-issue hypergeometric tests + Holm correction",
+    "description": "仅纳入已核验的逐期补算或有开奖前运行日志的真实预测，每模型每期第 1 注。前后区按不放回抽样的超几何分布逐期卷积；中奖事件按期做二项检验。对全部模型、前后区及中奖率使用 Holm 多重校正。图中区间为理论随机基线的 95% 参考范围，并非观测率置信区间。",
+    "theoretical_front": 0.14285714285714285,
+    "theoretical_back": 0.16666666666666666,
+    "theoretical_win": 0.06670476108331896,
+    "significance_level": 0.05,
+    "scope": "verified_only",
+    "excluded": "未核验的旧补算和同一期额外注数不进入显著性判断；全库汇总仅是历史描述。",
+    "analysis_type": "exploratory",
+    "sources": [
+      "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html"
+    ]
   },
   "models": [
     {
       "model": "bayesian",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 4,
+      "win_rate": 0.06896551724137931,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2054,
-        "slots": 14630,
-        "observed": 0.140396,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.134862,
-          0.14612
+        "hits": 35,
+        "slots": 290,
+        "observed": 0.1206896551724138,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.395016,
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 0.2836454882830416,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 977,
-        "slots": 5852,
-        "observed": 0.166951,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.157616,
-          0.176724
+        "hits": 23,
+        "slots": 116,
+        "observed": 0.19827586206896552,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.953382,
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.35980721463618953,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "与随机基线在 α=0.05 下不可区分 (前区 p=0.395, 后区 p=0.953)"
+      "win": {
+        "hits": 4,
+        "slots": 58,
+        "observed": 0.06896551724137931,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.7944782007108644,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     },
     {
       "model": "ensemble",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 4,
+      "win_rate": 0.06896551724137931,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2033,
-        "slots": 14630,
-        "observed": 0.138961,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.133451,
-          0.144661
+        "hits": 54,
+        "slots": 290,
+        "observed": 0.18620689655172415,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.178073,
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 0.03155725430305849,
+        "adjusted_p_value": 0.7889313575764622,
         "significant": false
       },
       "back": {
-        "hits": 996,
-        "slots": 5852,
-        "observed": 0.170198,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.160787,
-          0.180042
+        "hits": 14,
+        "slots": 116,
+        "observed": 0.1206896551724138,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.468507,
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.19128539375537598,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "与随机基线在 α=0.05 下不可区分 (前区 p=0.178, 后区 p=0.469)"
+      "win": {
+        "hits": 4,
+        "slots": 58,
+        "observed": 0.06896551724137931,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.7944782007108644,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     },
     {
       "model": "frequency",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 2,
+      "win_rate": 0.034482758620689655,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2096,
-        "slots": 14630,
-        "observed": 0.143267,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.137684,
-          0.149038
+        "hits": 38,
+        "slots": 290,
+        "observed": 0.1310344827586207,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.88727,
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 0.5923196725738337,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 957,
-        "slots": 5852,
-        "observed": 0.163534,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.154279,
-          0.17323
+        "hits": 14,
+        "slots": 116,
+        "observed": 0.1206896551724138,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.520181,
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.19128539375537598,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "与随机基线在 α=0.05 下不可区分 (前区 p=0.887, 后区 p=0.52)"
+      "win": {
+        "hits": 2,
+        "slots": 58,
+        "observed": 0.034482758620689655,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.4365978955624437,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     },
     {
       "model": "genetic",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 2,
+      "win_rate": 0.034482758620689655,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2243,
-        "slots": 14630,
-        "observed": 0.153315,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.147568,
-          0.159244
+        "hits": 45,
+        "slots": 290,
+        "observed": 0.15517241379310345,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.000301,
-        "significant": true
-      },
-      "back": {
-        "hits": 999,
-        "slots": 5852,
-        "observed": 0.170711,
-        "theoretical": 0.166667,
         "ci95": [
-          0.161288,
-          0.180566
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.40646,
+        "p_value": 0.5317156437799032,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "显著偏离随机：前区高于随机基线 (p=0.000301)"
+      "back": {
+        "hits": 14,
+        "slots": 116,
+        "observed": 0.1206896551724138,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.19128539375537598,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "win": {
+        "hits": 2,
+        "slots": 58,
+        "observed": 0.034482758620689655,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.4365978955624437,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     },
     {
       "model": "lstm",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 12,
+      "win_rate": 0.20689655172413793,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2057,
-        "slots": 14630,
-        "observed": 0.140602,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.135063,
-          0.146329
+        "hits": 52,
+        "slots": 290,
+        "observed": 0.1793103448275862,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.435582,
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 0.06099750552995998,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 973,
-        "slots": 5852,
-        "observed": 0.166268,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.156948,
-          0.176025
+        "hits": 23,
+        "slots": 116,
+        "observed": 0.19827586206896552,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.93477,
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.35980721463618953,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "与随机基线在 α=0.05 下不可区分 (前区 p=0.436, 后区 p=0.935)"
+      "win": {
+        "hits": 12,
+        "slots": 58,
+        "observed": 0.20689655172413793,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.00038332881761911765,
+        "adjusted_p_value": 0.010349878075716176,
+        "significant": true
+      },
+      "verdict": "中奖率高于理论随机基线（校正 p=0.0103），仍需后续前瞻验证"
     },
     {
       "model": "markov",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 6,
+      "win_rate": 0.10344827586206896,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2067,
-        "slots": 14630,
-        "observed": 0.141285,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.135735,
-          0.147023
+        "hits": 44,
+        "slots": 290,
+        "observed": 0.15172413793103448,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.586847,
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 0.6550860160512815,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 936,
-        "slots": 5852,
-        "observed": 0.159945,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.150777,
-          0.169559
+        "hits": 16,
+        "slots": 116,
+        "observed": 0.13793103448275862,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.167689,
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.43459351448864764,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "与随机基线在 α=0.05 下不可区分 (前区 p=0.587, 后区 p=0.168)"
+      "win": {
+        "hits": 6,
+        "slots": 58,
+        "observed": 0.10344827586206896,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.2825508624215688,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     },
     {
       "model": "random",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 5,
+      "win_rate": 0.08620689655172414,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2057,
-        "slots": 14630,
-        "observed": 0.140602,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.135063,
-          0.146329
+        "hits": 34,
+        "slots": 290,
+        "observed": 0.11724137931034483,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.435582,
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 0.21076705890591305,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 1034,
-        "slots": 5852,
-        "observed": 0.176692,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.167133,
-          0.186675
+        "hits": 32,
+        "slots": 116,
+        "observed": 0.27586206896551724,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.039608,
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.0016200578109738656,
+        "adjusted_p_value": 0.042121503085320505,
         "significant": true
       },
-      "verdict": "显著偏离随机：后区高于随机基线 (p=0.0396)"
+      "win": {
+        "hits": 5,
+        "slots": 58,
+        "observed": 0.08620689655172414,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.5925028484579438,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "后区高于理论随机基线（校正 p=0.0421），仍需后续前瞻验证"
     },
     {
       "model": "transformer",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 7,
+      "win_rate": 0.1206896551724138,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2366,
-        "slots": 14630,
-        "observed": 0.161722,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.155845,
-          0.167777
+        "hits": 46,
+        "slots": 290,
+        "observed": 0.15862068965517243,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.0,
-        "significant": true
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 0.421364190730721,
+        "adjusted_p_value": 1.0,
+        "significant": false
       },
       "back": {
-        "hits": 1146,
-        "slots": 5852,
-        "observed": 0.19583,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.185864,
-          0.206196
+        "hits": 23,
+        "slots": 116,
+        "observed": 0.19827586206896552,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.0,
-        "significant": true
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.35980721463618953,
+        "adjusted_p_value": 1.0,
+        "significant": false
       },
-      "verdict": "显著偏离随机：前区高于随机基线 (p=6.99e-11)；后区高于随机基线 (p=2.15e-09)"
+      "win": {
+        "hits": 7,
+        "slots": 58,
+        "observed": 0.1206896551724138,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.10849611002785432,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     },
     {
       "model": "xgboost",
-      "issues": 2923,
-      "tickets": 2926,
+      "issues": 58,
+      "tickets": 58,
+      "win_tickets": 6,
+      "win_rate": 0.10344827586206896,
+      "first_issue": "26059",
+      "last_issue": "26116",
+      "issue_set_sha256": "7b45ae658569cdb4d2a2e4708e444a71237fd088c42b95377094ea906abdb799",
       "front": {
-        "hits": 2079,
-        "slots": 14630,
-        "observed": 0.142105,
-        "theoretical": 0.142857,
-        "ci95": [
-          0.136541,
-          0.147857
+        "hits": 41,
+        "slots": 290,
+        "observed": 0.1413793103448276,
+        "theoretical": 0.14285714285714285,
+        "null_interval95": [
+          0.10689655172413794,
+          0.18275862068965518
         ],
-        "p_value": 0.794947,
+        "ci95": [
+          0.10689655172413794,
+          0.18275862068965518
+        ],
+        "p_value": 1.0,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 968,
-        "slots": 5852,
-        "observed": 0.165414,
-        "theoretical": 0.166667,
-        "ci95": [
-          0.156114,
-          0.175152
+        "hits": 22,
+        "slots": 116,
+        "observed": 0.1896551724137931,
+        "theoretical": 0.16666666666666666,
+        "null_interval95": [
+          0.10344827586206896,
+          0.23275862068965517
         ],
-        "p_value": 0.797004,
+        "ci95": [
+          0.10344827586206896,
+          0.23275862068965517
+        ],
+        "p_value": 0.5131275244589455,
+        "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "与随机基线在 α=0.05 下不可区分 (前区 p=0.795, 后区 p=0.797)"
+      "win": {
+        "hits": 6,
+        "slots": 58,
+        "observed": 0.10344827586206896,
+        "theoretical": 0.06670476108331896,
+        "p_value": 0.2825508624215688,
+        "adjusted_p_value": 1.0,
+        "significant": false
+      },
+      "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     }
   ]
 }

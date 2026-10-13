@@ -1,216 +1,207 @@
-"""
-显著性检验：判决 9 个模型是否"统计意义上" 跑赢了随机基线
-
-理论基础
--------
-大乐透前区单号单期出现概率 = C(34,4)/C(35,5) = 5/35 ≈ 0.14286
-后区单号单期出现概率 = 2/12 ≈ 0.16667
-
-对某模型在 N 期回测中的预测，设它"号码命中事件"总次数为 K（每期贡献
-5 个前区槽和 2 个后区槽），则在"模型实为随机"的原假设下：
-
-    K ~ Binomial(n = N * slots, p = theoretical)
-
-本模块给出：
-  - Wilson 95% 置信区间
-  - 精确 / 正态近似二项检验 p 值（双侧）
-  - 判决词：显著偏离 / 与随机不可区分
-"""
+"""Evaluate verified single-ticket predictions with finite-population draw statistics."""
 from __future__ import annotations
 
 import json
+import hashlib
 import math
+import re
 from collections import defaultdict
-from typing import Dict, List
+from datetime import datetime, timezone
+from functools import lru_cache
+from pathlib import Path
 
-from ..config import BACK_COUNT, BACK_MAX, EXPORT_DIR, FRONT_COUNT, FRONT_MAX
+from ..config import BACK_COUNT, BACK_MAX, EXPORT_DIR, FRONT_COUNT, FRONT_MAX, MODELS, PRIZE_TABLE
 from ..db import get_conn
 
 THEORETICAL_FRONT = FRONT_COUNT / FRONT_MAX
 THEORETICAL_BACK = BACK_COUNT / BACK_MAX
+LOG_ROOT = Path(__file__).resolve().parents[3] / "docs"
 
-Z_95 = 1.959964
 
+@lru_cache(maxsize=128)
+def hit_distribution(periods: int, population: int, picks: int) -> tuple[float, ...]:
+    """Convolve whole-draw hypergeometric hit counts across independent issues.
 
-def wilson_ci(k: int, n: int, z: float = Z_95) -> tuple[float, float, float]:
+    @returns P(total hits=k), retaining dependence among slots of one ticket.
     """
-    Wilson score 置信区间（比正态近似更稳，即使 p 接近 0 / 1 / n 较小都成立）
-
-    @param k 成功次数
-    @param n 总次数
-    @param z 置信水平对应的 z 分数（默认 95%）
-    @returns (p_hat, ci_low, ci_high)
-    """
-    if n == 0:
-        return 0.0, 0.0, 1.0
-    p = k / n
-    denom = 1.0 + z * z / n
-    center = (p + z * z / (2.0 * n)) / denom
-    half = z * math.sqrt(p * (1.0 - p) / n + z * z / (4.0 * n * n)) / denom
-    return p, max(0.0, center - half), min(1.0, center + half)
-
-
-def _normal_sf(x: float) -> float:
-    """标准正态分布的 1-CDF（survival function）"""
-    return 0.5 * math.erfc(x / math.sqrt(2.0))
+    if periods < 0 or not 0 < picks <= population:
+        raise ValueError("Invalid draw distribution parameters")
+    denominator = math.comb(population, picks)
+    one = [math.comb(picks, h) * math.comb(population - picks, picks - h) / denominator
+           if 0 <= picks - h <= population - picks else 0.0 for h in range(picks + 1)]
+    result = [1.0]
+    for _ in range(periods):
+        next_result = [0.0] * (len(result) + picks)
+        for i, probability in enumerate(result):
+            for j, weight in enumerate(one):
+                next_result[i + j] += probability * weight
+        result = next_result
+    total = sum(result)
+    return tuple(p / total for p in result)
 
 
-def binom_test_two_sided(k: int, n: int, p0: float) -> float:
-    """
-    双侧二项检验 p 值
-
-    @param k 观测到的成功次数
-    @param n 总试验次数
-    @param p0 原假设下的概率
-    @returns 双侧 p 值
-    """
-    if n == 0:
-        return 1.0
-    if n <= 1000:
-        log_p0 = math.log(p0) if p0 > 0 else float("-inf")
-        log_q0 = math.log(1 - p0) if p0 < 1 else float("-inf")
-        log_coef = [0.0] * (n + 1)
-        for i in range(1, n + 1):
-            log_coef[i] = log_coef[i - 1] + math.log((n - i + 1) / i)
-        log_pmf = [log_coef[i] + i * log_p0 + (n - i) * log_q0 for i in range(n + 1)]
-        m = max(log_pmf)
-        pmf = [math.exp(x - m) for x in log_pmf]
-        norm = sum(pmf)
-        pmf = [x / norm for x in pmf]
-        obs = pmf[k]
-        return float(sum(x for x in pmf if x <= obs + 1e-12))
-    mu = n * p0
-    sigma = math.sqrt(n * p0 * (1.0 - p0))
-    z = (k - mu) / sigma
-    return float(2.0 * _normal_sf(abs(z)))
+def _mass_test(k: int, pmf: tuple[float, ...]) -> float:
+    """@returns Two-sided probability-ordering exact p value."""
+    if not 0 <= k < len(pmf):
+        raise ValueError("Observed hits outside the possible range")
+    return min(1.0, sum(p for p in pmf if p <= pmf[k] * (1 + 1e-12)))
 
 
-def _collect_per_model_hits() -> Dict[str, dict]:
-    """
-    从 results 表中聚合每个模型的 (命中前区数, 命中后区数, 期数, 注数)
+def exact_hit_test(hits: int, periods: int, population: int, picks: int) -> float:
+    """@returns Exact test of total hits under uniform independent draws."""
+    return _mass_test(hits, hit_distribution(periods, population, picks))
 
-    @returns model -> {front_hits, front_slots, back_hits, back_slots,
-                       issues, tickets}
-    """
-    stat: Dict[str, dict] = defaultdict(lambda: {
-        "front_hits": 0,
-        "front_slots": 0,
-        "back_hits": 0,
-        "back_slots": 0,
-        "issues": set(),
-        "tickets": 0,
-    })
+
+def holm_adjust(values: list[float]) -> list[float]:
+    """@returns Holm-adjusted p values, valid without independence between models."""
+    adjusted = [1.0] * len(values)
+    previous = 0.0
+    for rank, index in enumerate(sorted(range(len(values)), key=values.__getitem__)):
+        previous = max(previous, min(1.0, (len(values) - rank) * values[index]))
+        adjusted[index] = previous
+    return adjusted
+
+
+def _null_interval(pmf: tuple[float, ...], slots: int) -> list[float]:
+    """@returns Equal-tail 95% null reference range, not an observed-rate CI."""
+    bounds = []
+    for quantile in (0.025, 0.975):
+        cumulative = 0.0
+        for k, probability in enumerate(pmf):
+            cumulative += probability
+            if cumulative >= quantile:
+                bounds.append(k / slots)
+                break
+    return bounds
+
+
+def _eligible(issue: str, draw_date: str, created: str, ranges: list, logged: dict) -> bool:
+    """Accept audited simulations or logged predictions made before the draw."""
+    if any(start <= issue <= end for start, end in ranges):
+        return True
+    if issue not in logged:
+        return False
+    try:
+        draw_at = datetime.fromisoformat(draw_date + "T20:30:00+08:00")
+        created_at = datetime.fromisoformat(created)
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+        return created_at < draw_at and any(ts < draw_at for ts in logged[issue])
+    except (TypeError, ValueError):
+        return False
+
+
+def _collect_per_model_hits(log_paths: list[Path] | None = None) -> dict:
+    """Collect only ticket zero with audited provenance or a pre-draw prediction log."""
+    ranges, logged = [], defaultdict(list)
+    for path in log_paths if log_paths is not None else sorted(LOG_ROOT.glob("RUN_LOG*.jsonl")):
+        for line in path.read_text().splitlines():
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            if record.get("outcome") != "success":
+                continue
+            extra = record.get("extra") or {}
+            if extra.get("recovery") is True and extra.get("historical_simulation") is True:
+                start, end = extra.get("start_issue", ""), extra.get("end_issue", "")
+                if re.fullmatch(r"\d{5}", start) and re.fullmatch(r"\d{5}", end) and start <= end:
+                    ranges.append((start, end))
+            issue = extra.get("predicted_issue")
+            if record.get("workflow") == "predict" and isinstance(issue, str) and re.fullmatch(r"\d{5}", issue):
+                try:
+                    ts = datetime.fromisoformat(record.get("ts") or "")
+                    if ts.tzinfo is not None:
+                        logged[issue].append(ts)
+                except ValueError:
+                    continue
+    stat = defaultdict(lambda: {"front_hits": 0, "front_slots": 0, "back_hits": 0,
+                                "back_slots": 0, "issues": set(), "tickets": 0, "wins": 0})
     with get_conn() as conn:
         rows = conn.execute("""
-            SELECT issue, model, ticket_idx, front_hit, back_hit
-            FROM results
+            SELECT r.issue,r.model,r.front_hit,r.back_hit,r.prize_amount,d.draw_date,p.created_at
+            FROM results r JOIN draws d ON d.issue=r.issue
+            JOIN predictions p ON p.issue=r.issue AND p.model=r.model AND p.ticket_idx=r.ticket_idx
+            WHERE r.ticket_idx=0 ORDER BY r.issue
         """).fetchall()
-    for r in rows:
-        s = stat[r["model"]]
-        s["front_hits"] += int(r["front_hit"])
-        s["back_hits"] += int(r["back_hit"])
+    for row in rows:
+        if row["model"] not in MODELS or not _eligible(row["issue"], row["draw_date"], row["created_at"], ranges, logged):
+            continue
+        s = stat[row["model"]]
+        s["front_hits"] += row["front_hit"]
+        s["back_hits"] += row["back_hit"]
         s["front_slots"] += FRONT_COUNT
         s["back_slots"] += BACK_COUNT
-        s["issues"].add(r["issue"])
+        s["issues"].add(row["issue"])
         s["tickets"] += 1
-    return stat
+        s["wins"] += row["prize_amount"] > 0
+    return dict(stat)
 
 
-def compute_significance() -> List[dict]:
-    """
-    给每个模型生成"显著性卡片"
+def _win_probability() -> float:
+    """@returns Any-prize probability under the project's 5+2 prize conditions."""
+    front, back = hit_distribution(1, FRONT_MAX, FRONT_COUNT), hit_distribution(1, BACK_MAX, BACK_COUNT)
+    return sum(front[f] * back[b] for f, b in PRIZE_TABLE)
 
-    @returns 列表，每项形如
-      {
-        "model": "bayesian",
-        "issues": 412,
-        "tickets": 412,
-        "front": {
-          "hits": 298, "slots": 2060,
-          "observed": 0.1447, "theoretical": 0.14286,
-          "ci95": [0.129, 0.161],
-          "p_value": 0.83, "significant": False
-        },
-        "back":  { ... 同上 },
-        "verdict": "与随机基线在 α=0.05 下不可区分"
-      }
-    """
-    raw = _collect_per_model_hits()
-    out: List[dict] = []
-    for model, s in raw.items():
-        f_hits, f_slots = s["front_hits"], s["front_slots"]
-        b_hits, b_slots = s["back_hits"], s["back_slots"]
 
-        f_obs, f_lo, f_hi = wilson_ci(f_hits, f_slots)
-        b_obs, b_lo, b_hi = wilson_ci(b_hits, b_slots)
-        f_p = binom_test_two_sided(f_hits, f_slots, THEORETICAL_FRONT)
-        b_p = binom_test_two_sided(b_hits, b_slots, THEORETICAL_BACK)
-        f_sig = f_p < 0.05
-        b_sig = b_p < 0.05
+def _win_test(wins: int, periods: int, probability: float) -> float:
+    # One prize event per issue is Bernoulli; number slots within that issue are not.
+    pmf = tuple(math.exp(math.lgamma(periods + 1) - math.lgamma(k + 1) - math.lgamma(periods - k + 1)
+                          + k * math.log(probability) + (periods - k) * math.log1p(-probability))
+                for k in range(periods + 1))
+    return _mass_test(wins, pmf)
 
-        low_sample = len(s["issues"]) < 30
-        if low_sample:
-            verdict = (
-                f"样本不足（仅 {len(s['issues'])} 期），无法做统计判决；"
-                "需要 ≥30 期回测才能给出置信区间较窄的结论。"
-            )
-        elif f_sig or b_sig:
-            parts = []
-            if f_sig:
-                parts.append(
-                    f"前区{('高于' if f_obs > THEORETICAL_FRONT else '低于')}随机基线 (p={f_p:.3g})"
-                )
-            if b_sig:
-                parts.append(
-                    f"后区{('高于' if b_obs > THEORETICAL_BACK else '低于')}随机基线 (p={b_p:.3g})"
-                )
-            verdict = "显著偏离随机：" + "；".join(parts)
-        else:
-            verdict = f"与随机基线在 α=0.05 下不可区分 (前区 p={f_p:.3g}, 后区 p={b_p:.3g})"
 
-        out.append({
-            "model": model,
-            "issues": len(s["issues"]),
-            "tickets": s["tickets"],
-            "front": {
-                "hits": f_hits,
-                "slots": f_slots,
-                "observed": round(f_obs, 6),
-                "theoretical": round(THEORETICAL_FRONT, 6),
-                "ci95": [round(f_lo, 6), round(f_hi, 6)],
-                "p_value": round(f_p, 6),
-                "significant": f_sig,
-            },
-            "back": {
-                "hits": b_hits,
-                "slots": b_slots,
-                "observed": round(b_obs, 6),
-                "theoretical": round(THEORETICAL_BACK, 6),
-                "ci95": [round(b_lo, 6), round(b_hi, 6)],
-                "p_value": round(b_p, 6),
-                "significant": b_sig,
-            },
-            "verdict": verdict,
-        })
-    out.sort(key=lambda x: x["model"])
+def compute_significance() -> list[dict]:
+    """Return audited per-model hit tests and corrected winning-event tests."""
+    out, probabilities = [], []
+    prior = _win_probability()
+    for model, s in sorted(_collect_per_model_hits().items()):
+        n = s["tickets"]
+        regions = {}
+        for key, population, picks in (("front", FRONT_MAX, FRONT_COUNT), ("back", BACK_MAX, BACK_COUNT)):
+            pmf = hit_distribution(n, population, picks)
+            interval = _null_interval(pmf, n * picks)
+            regions[key] = {
+                "hits": s[f"{key}_hits"], "slots": n * picks,
+                "observed": s[f"{key}_hits"] / (n * picks), "theoretical": picks / population,
+                "null_interval95": interval,
+                "ci95": interval,  # Legacy key retained for cached clients; it is a null range.
+                "p_value": _mass_test(s[f"{key}_hits"], pmf),
+            }
+        regions["win"] = {"hits": s["wins"], "slots": n, "observed": s["wins"] / n,
+                          "theoretical": prior, "p_value": _win_test(s["wins"], n, prior)}
+        item = {"model": model, "issues": n, "tickets": n, "win_tickets": s["wins"],
+                "win_rate": s["wins"] / n, "first_issue": min(s["issues"]), "last_issue": max(s["issues"]),
+                "issue_set_sha256": hashlib.sha256(json.dumps(sorted(s["issues"])).encode()).hexdigest(), **regions}
+        out.append(item)
+        probabilities.extend(item[key]["p_value"] for key in ("front", "back", "win"))
+    adjusted = iter(holm_adjust(probabilities))
+    for item in out:
+        parts = []
+        for key, label in (("front", "前区"), ("back", "后区"), ("win", "中奖率")):
+            region = item[key]
+            region["adjusted_p_value"] = next(adjusted)
+            region["significant"] = region["adjusted_p_value"] < 0.05 and item["issues"] >= 30
+            if region["significant"]:
+                direction = "高于" if region["observed"] > region["theoretical"] else "低于"
+                parts.append(f"{label}{direction}理论随机基线（校正 p={region['adjusted_p_value']:.3g}）")
+        item["verdict"] = ("样本少于 30 期，仅供观察" if item["issues"] < 30 else
+                           "；".join(parts) + "，仍需后续前瞻验证" if parts else
+                           "多重校正后，未检测到与理论随机基线的显著差异")
     return out
 
 
 def export_significance() -> None:
-    """
-    把显著性检验结果导出到前端可读的 JSON
-    """
+    """Export truthful statistical scope without asserting unverified backtests are clean."""
     data = {
         "methodology": {
-            "name": "Walk-forward backtest + Binomial test",
-            "description": (
-                "对每个模型：每期只用此期之前的历史训练/拟合，单期单模型出 1 注预测；"
-                "开奖后记录命中个数。汇总 N 期后，对号码命中事件做二项检验 "
-                "(H0: 模型 ≡ 随机抽号)，并给出 Wilson 95% 置信区间。"
-            ),
-            "theoretical_front": round(THEORETICAL_FRONT, 6),
-            "theoretical_back": round(THEORETICAL_BACK, 6),
-            "significance_level": 0.05,
+            "name": "Verified per-issue hypergeometric tests + Holm correction",
+            "description": "仅纳入已核验的逐期补算或有开奖前运行日志的真实预测，每模型每期第 1 注。前后区按不放回抽样的超几何分布逐期卷积；中奖事件按期做二项检验。对全部模型、前后区及中奖率使用 Holm 多重校正。图中区间为理论随机基线的 95% 参考范围，并非观测率置信区间。",
+            "theoretical_front": THEORETICAL_FRONT, "theoretical_back": THEORETICAL_BACK,
+            "theoretical_win": _win_probability(), "significance_level": 0.05,
+            "scope": "verified_only", "excluded": "未核验的旧补算和同一期额外注数不进入显著性判断；全库汇总仅是历史描述。",
+            "analysis_type": "exploratory",
+            "sources": ["https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html"],
         },
         "models": compute_significance(),
     }

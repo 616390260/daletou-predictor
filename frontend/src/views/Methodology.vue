@@ -31,7 +31,7 @@
       <div class="card-title">1. 回测协议：Walk-Forward（滚动单步）</div>
       <p>
         时间序列场景下，如果"训练/测试"不按时间切分，模型会偷看未来（look-ahead bias），
-        指标会虚高。我们采用严格的 walk-forward：
+        指标会虚高。有效评估应采用严格的 walk-forward：
       </p>
       <ol class="steps">
         <li>从第 <b>k</b> 期开始，每次<b>只用 [1..i-1] 期</b>的历史训练模型</li>
@@ -39,6 +39,7 @@
         <li>实际开奖后记录命中：前区中几个、后区中几个</li>
         <li>i ← i+1，回到第 2 步</li>
       </ol>
+      <p class="muted">旧回测记录尚未全部通过权重与时间边界核验。下面的统计仅使用已核验逐期补算或有开奖前运行日志的记录，全库累计指标只作历史描述。</p>
       <p class="muted k-note">
         <b>最早从哪一期开始评估？</b> 不是「随便空 50 期」，而是技术下限：LSTM / Transformer / XGBoost
         需要至少过去 <b>10</b> 期构造序列特征，再加 1 期才能形成一条训练样本，因此全库回测里
@@ -75,20 +76,21 @@
         </div>
       </div>
       <p class="muted">
-        H<sub>0</sub>（原假设）：模型 ≡ 随机。用二项检验（Binomial test）给出 p 值，
-        α = 0.05；置信区间用 <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval" target="_blank" rel="noopener">Wilson score</a>（比正态近似稳定，即使 p 接近 0 / 1 也不失真）。
+        H<sub>0</sub>（原假设）：均匀、独立开奖。同一注内号码不独立，前后区命中数按
+        <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html" target="_blank" rel="noopener">超几何分布</a>
+        逐期卷积；每期是否中奖才是一次二项事件。全部模型、前后区和中奖率共同进行 Holm 多重校正，α = 0.05。
+        图中竖线是理论随机基线的 95% 参考范围，点是实际观测值，并非观测率置信区间。
       </p>
     </section>
 
     <!-- 3. 每个模型 vs 随机基线 -->
     <section class="card">
       <div class="card-title">
-        3. 9 个模型 vs 随机基线（前区命中率 95% CI）
-        <span v-if="totalIssues" class="chip">累计 {{ totalIssues }} 期 · {{ totalTickets }} 注</span>
+        3. 已核验记录 vs 理论随机基线
+        <span v-if="totalIssues" class="chip">已核验 {{ totalIssues }} 期 · {{ totalTickets }} 注</span>
       </div>
       <p v-if="sampleLow" class="warn-banner">
-        ⚠️ 当前回测样本仅 {{ totalIssues }} 期，置信区间会非常宽，判决仅供参考。
-        推荐跑到 <b>≥300 期</b>（触发 backtest workflow 回填）。
+        当前已核验样本仅 {{ totalIssues }} 期，判决仅供观察。需要积累更多可核验的后续预测，单纯增加旧补算期数不能证明有效。
       </p>
       <v-chart v-if="models.length" class="chart chart-ci" :option="frontChartOption" autoresize />
       <v-chart v-if="models.length" class="chart chart-ci" :option="backChartOption" autoresize />
@@ -108,9 +110,11 @@
               <th>模型</th>
               <th>期数</th>
               <th>前区观测率</th>
-              <th>前区 p 值</th>
+              <th>前区校正 p</th>
               <th>后区观测率</th>
-              <th>后区 p 值</th>
+              <th>后区校正 p</th>
+              <th>中奖 / 注数</th>
+              <th>中奖率校正 p</th>
               <th>判决</th>
             </tr>
           </thead>
@@ -122,18 +126,20 @@
               <td class="mono">{{ m.issues }}</td>
               <td class="mono">
                 {{ pct(m.front.observed) }}
-                <span class="ci">[{{ pct(m.front.ci95[0]) }}, {{ pct(m.front.ci95[1]) }}]</span>
+                <span class="ci">随机范围 [{{ pct(m.front.ci95[0]) }}, {{ pct(m.front.ci95[1]) }}]</span>
               </td>
               <td class="mono" :class="{ 'p-sig': m.front.significant && !sampleLow }">
-                {{ m.front.p_value.toFixed(3) }}
+                {{ (m.front.adjusted_p_value ?? m.front.p_value).toFixed(3) }}
               </td>
               <td class="mono">
                 {{ pct(m.back.observed) }}
-                <span class="ci">[{{ pct(m.back.ci95[0]) }}, {{ pct(m.back.ci95[1]) }}]</span>
+                <span class="ci">随机范围 [{{ pct(m.back.ci95[0]) }}, {{ pct(m.back.ci95[1]) }}]</span>
               </td>
               <td class="mono" :class="{ 'p-sig': m.back.significant && !sampleLow }">
-                {{ m.back.p_value.toFixed(3) }}
+                {{ (m.back.adjusted_p_value ?? m.back.p_value).toFixed(3) }}
               </td>
+              <td class="mono">{{ m.win_tickets ?? '—' }} / {{ m.tickets }}</td>
+              <td class="mono" :class="{ 'p-sig': m.win?.significant && !sampleLow }">{{ m.win ? m.win.adjusted_p_value.toFixed(3) : '—' }}</td>
               <td class="verdict">{{ m.verdict }}</td>
             </tr>
           </tbody>
@@ -149,21 +155,17 @@
         这并不意味着它们有效，而是说"证据不足以否定 H<sub>0</sub>"。
       </p>
       <p v-else-if="anySig">
-        有 <b>{{ sigModels.length }}</b> 个模型在 α=0.05 下
-        <b class="up">显著偏离随机</b>：
+        有 <b>{{ sigModels.length }}</b> 个模型在多重校正后显著偏离理论随机基线：
         <span v-for="(n, i) in sigModels" :key="n">
           {{ label(n) }}{{ i < sigModels.length - 1 ? "、" : "" }}
         </span>。
-        但这**仍不能说模型能真的预测**——在 9 次独立检验下，按 Bonferroni 校正，
-        真正"跨域显著"的阈值是 α/9 ≈ <b>0.0056</b>。
+        仍需核对偏离方向、数据质量，并用后续开奖前发布的预测复验。短期偏离不等同于稳定预测能力。
       </p>
       <p v-else>
-        全部 9 个模型的前/后区命中频率都在随机基线的 95% 置信区间内，
-        <b>统计上无法拒绝"它们等同于随机抽号"这个原假设</b>。
+        在当前已核验样本与多重校正下，未检测到显著偏离理论随机基线的模型。证据不足不等同于已经证明模型无效或有效。
       </p>
       <p class="muted tip">
-        这和我们对彩票的数学直觉一致：大乐透是独立同分布的抽样过程，历史不含关于未来的信息。
-        ML 模型在这样的数据上，最多做到和随机基线"打平"，不可能稳定超越。
+        检验以均匀独立开奖为原假设。走势图可以帮助核查频率、遗漏和异常，但历史形状本身不能证明下一期可预测。
       </p>
     </section>
   </div>
@@ -226,11 +228,11 @@ const totalTickets = computed(() =>
 );
 const sampleLow = computed(() => totalIssues.value < 30);
 const anySig = computed(() =>
-  models.value.some((m) => m.front.significant || m.back.significant),
+  models.value.some((m) => m.front.significant || m.back.significant || m.win?.significant),
 );
 const sigModels = computed(() =>
   models.value
-    .filter((m) => m.front.significant || m.back.significant)
+    .filter((m) => m.front.significant || m.back.significant || m.win?.significant)
     .map((m) => m.model),
 );
 
@@ -254,12 +256,12 @@ function buildCIOption(key, theoretical, titleText) {
     observed: m[key].observed,
     lo: m[key].ci95[0],
     hi: m[key].ci95[1],
-    p: m[key].p_value,
+    p: m[key].adjusted_p_value ?? m[key].p_value,
     sig: m[key].significant && !sampleLow.value,
     issues: m.issues,
   }));
-  const maxHi = Math.max(theoretical, ...data.map((d) => d.hi));
-  const minLo = Math.min(theoretical, ...data.map((d) => d.lo));
+  const maxHi = Math.max(theoretical, ...data.map((d) => Math.max(d.hi, d.observed)));
+  const minLo = Math.min(theoretical, ...data.map((d) => Math.min(d.lo, d.observed)));
   const pad = (maxHi - minLo) * 0.2 + 0.01;
 
   return {
@@ -278,9 +280,9 @@ function buildCIOption(key, theoretical, titleText) {
         const d = p.data;
         return `<b>${d.name}</b><br/>
           观测命中率：<b>${(d.observed * 100).toFixed(2)}%</b><br/>
-          95% CI：[${(d.lo * 100).toFixed(2)}%, ${(d.hi * 100).toFixed(2)}%]<br/>
+          随机基线95%范围：[${(d.lo * 100).toFixed(2)}%, ${(d.hi * 100).toFixed(2)}%]<br/>
           理论基线：${(theoretical * 100).toFixed(2)}%<br/>
-          p 值：<b>${d.p.toFixed(4)}</b>${d.sig ? " ⚠️ 显著" : ""}<br/>
+          校正 p 值：<b>${d.p.toFixed(4)}</b>${d.sig ? " 显著" : ""}<br/>
           回测期数：${d.issues}`;
       },
     },
@@ -366,10 +368,10 @@ function buildCIOption(key, theoretical, titleText) {
 }
 
 const frontChartOption = computed(() =>
-  buildCIOption("front", methodology.value?.theoretical_front ?? 5 / 35, "前区单号命中率 + 95% CI"),
+  buildCIOption("front", methodology.value?.theoretical_front ?? 5 / 35, "前区观测率与随机基线95%范围"),
 );
 const backChartOption = computed(() =>
-  buildCIOption("back", methodology.value?.theoretical_back ?? 2 / 12, "后区单号命中率 + 95% CI"),
+  buildCIOption("back", methodology.value?.theoretical_back ?? 2 / 12, "后区观测率与随机基线95%范围"),
 );
 </script>
 

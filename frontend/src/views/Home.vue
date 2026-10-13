@@ -15,6 +15,26 @@
       </p>
     </section>
 
+    <section v-if="nextPrediction && !nextPrediction.real" class="card laya-current" aria-labelledby="home-laya-title">
+      <div class="section-title">
+        <h2 id="home-laya-title">第 {{ nextPrediction.issue }} 期 · Laya 独立选择</h2>
+        <router-link to="/predictions" class="see-all">查看独立评审记录 →</router-link>
+      </div>
+      <template v-if="currentLaya">
+        <div class="laya-choice">
+          <BallRow :front="currentLaya.front" :back="currentLaya.back" size="md" />
+          <span class="model-badge" :data-model="currentLaya.selected_model">选自 {{ currentLaya.label }}</span>
+        </div>
+        <p class="laya-detail">训练截止 {{ currentLaya.trained_through_issue }} 期 · 实验评审 · 待开奖核对</p>
+        <p class="laya-detail">从九模型候选中独立选择一注，评分不代表可靠中奖概率。</p>
+        <details class="laya-trend">
+          <summary>查看入选号码近 30 期走势</summary>
+          <NumberTrend :history="history" :decision="currentLaya" />
+        </details>
+      </template>
+      <p v-else class="laya-detail">{{ layaLoaded ? "本期独立评审尚未生成或暂时无法加载，九模型预测仍可查看。" : "正在加载本期独立评审…" }}</p>
+    </section>
+
     <!-- 顶部三大卡：倒计时 / 最新开奖 / 累计 ROI -->
     <section class="top-grid">
       <!-- 下次开奖倒计时 -->
@@ -153,6 +173,27 @@
     </section>
 
     <!-- 各模型 KPI 汇总 -->
+    <section v-if="verifiedModels.length" class="card verified-results">
+      <div class="section-title">
+        <h2>{{ verifiedAligned ? `最近已核验 ${verifiedModels[0].issues} 期表现` : '已核验表现 · 样本区间不同' }}</h2>
+        <router-link to="/methodology" class="see-all">查看统计检验 →</router-link>
+      </div>
+      <p v-if="verifiedAligned" class="laya-detail">{{ verifiedModels[0].first_issue }}—{{ verifiedModels[0].last_issue }} 期，每模型每期一注，含已核验历史补算；全库累计数据不等同于已核验回测。</p>
+      <p v-else class="laya-detail">各行使用各自的已核验记录，期号集合一致时才展示同期随机模型。含历史补算，不能将区间差异当作模型优势。</p>
+      <div class="verified-table-wrap">
+        <table class="table">
+          <thead><tr><th>模型</th><th class="num">中奖 / 注数</th><th class="num">中奖率</th><th class="num">同期随机模型</th></tr></thead>
+          <tbody><tr v-for="model in verifiedModels" :key="model.model">
+            <td><span class="model-badge" :data-model="model.model">{{ MODEL_LABELS[model.model] || model.model }}</span><div v-if="!verifiedAligned" class="laya-detail">{{ model.first_issue }}—{{ model.last_issue }} 期</div></td>
+            <td class="num">{{ model.win_tickets }} / {{ model.tickets }}</td>
+            <td class="num">{{ (model.win_rate * 100).toFixed(2) }}%</td>
+            <td class="num">{{ verifiedRandom && model.issue_set_sha256 && model.issue_set_sha256 === verifiedRandom.issue_set_sha256 ? (verifiedRandom.win_rate * 100).toFixed(2) + '%' : '区间不一致' }}</td>
+          </tr></tbody>
+        </table>
+      </div>
+      <p class="laya-detail">短期表现可能波动，仍需后续开奖前发布的预测验证。</p>
+    </section>
+
     <section class="grid stats-grid" v-if="stats.summary.length">
       <div class="card stat-card" v-for="s in stats.summary" :key="s.model">
         <div class="stat-head">
@@ -214,11 +255,19 @@
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { api } from "../api";
 import BallRow from "../components/BallRow.vue";
+import NumberTrend from "../components/NumberTrend.vue";
+import { MODEL_LABELS } from "../api/models";
 
 const meta = ref(null);
 const history = ref([]);
 const stats = ref({ summary: [], trend: {} });
 const predictions = ref([]);
+const laya = ref(null);
+const layaLoaded = ref(false);
+const verifiedModels = ref([]);
+const verifiedRandom = computed(() => verifiedModels.value.find((m) => m.model === "random"));
+const verifiedAligned = computed(() => verifiedModels.value.length > 0 && Boolean(verifiedModels.value[0].issue_set_sha256)
+  && verifiedModels.value.every((m) => m.issue_set_sha256 === verifiedModels.value[0].issue_set_sha256));
 const now = ref(new Date());
 
 let timer = null;
@@ -230,6 +279,13 @@ const nextPrediction = computed(() => {
   const issue = meta.value?.predicting_issue;
   const target = predictions.value.find((p) => p.issue === issue) || predictions.value[0];
   return target;
+});
+
+const currentLaya = computed(() => {
+  const target = nextPrediction.value;
+  if (!target || target.real) return null;
+  const decisions = Array.isArray(laya.value?.decisions) ? laya.value.decisions : [];
+  return decisions.find((d) => d.issue === target.issue && d.kind === "prospective") || null;
 });
 
 const lastReview = computed(() => {
@@ -308,6 +364,8 @@ function formatFull(iso) {
 }
 
 onMounted(async () => {
+  api.laya().then((data) => { laya.value = data; layaLoaded.value = true; });
+  api.significance().then((data) => { verifiedModels.value = data?.methodology?.scope === "verified_only" && Array.isArray(data.models) ? data.models : []; });
   const [m, h, s, p] = await Promise.all([
     api.meta(),
     api.history(),
@@ -327,6 +385,17 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.laya-choice { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+.laya-detail { color: var(--text-2); font-size: 13px; line-height: 1.7; margin-top: 12px; }
+.laya-current, .verified-results { min-width: 0; }
+.laya-trend { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+.laya-trend summary { cursor: pointer; color: var(--text-2); font-size: 13px; }
+.laya-trend summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+.verified-table-wrap { overflow-x: auto; margin-top: 16px; }
+@media (max-width: 600px) {
+  .laya-current .section-title, .verified-results .section-title { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .verified-results th, .verified-results td { white-space: nowrap; }
+}
 .home {
   display: flex;
   flex-direction: column;
