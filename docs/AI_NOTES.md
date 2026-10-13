@@ -46,8 +46,8 @@ sed -n '1,80p' docs/AI_NOTES.md
 
 ### ❌ 误判 5：「meta.json 显示最新期号 = DB 在 git 里也是最新的」
 
-**真相**：predict/evaluate workflow 每次运行时 fetch_history 更新 DB，生成 meta.json，但 DB 没有被 commit 进 git（glob `data/*.db` 在 git-auto-commit-action@v5 里被静默忽略）。
-**已修复**：2026-05-27 把 `data/*.db` 改为 `data/daletou.db`（direct path）。如果再次看到 meta.json 里期号远超 `git log -- data/daletou.db` 最后修改时间，说明 DB commit 又挂了。
+**真相**：predict/evaluate workflow 可以更新 meta.json，却未持久化 DB。2026-10-13 已确认 `git-auto-commit-action@v5` 用 `read -r -a` 读取 `file_pattern`，YAML 的 `|` 多行清单只会消费第一行。predict/evaluate 只保存图片，DB/权重/RUN_LOG 均被遗漏。
+**修复**：使用 `>-` 把清单折成空格分隔的一行；可选归档文件用 `docs/RUN_LOG*.jsonl` 匹配。此前把 glob 改成 direct path 的判断不完整，不能视为修复依据。如果 meta.json 期号远超 DB 最后提交时间，先检查实际被 `git add` 的完整清单。
 **检查命令**：`git log --oneline -3 -- data/daletou.db`，看最后一次修改时间是否合理。
 
 ### ❌ 误判 4：「想通过加新模型/调超参提高命中率」
@@ -109,6 +109,17 @@ git log --since="7 days ago" --oneline -- docs/RUN_LOG.jsonl
 
 > 每次进入本 repo 完成反思后，**只在有新发现**时追加一条。无新发现就别污染。
 > 格式：`### [YYYY-MM-DD HH:MM 模型名] 一行总结` + 必要的 bullet。
+
+### [2026-10-13 Codex] 预测断在 26058：多行提交清单漏掉 DB 与权重
+
+- GitHub main 的 DB 最晚开奖 26059、预测/结果最晚 26058；线上 history/meta 已更新到 26116，但 LSTM/Transformer 元数据仍训练到 26057。
+- 已读取 evaluate run `38340180532` 的日志：RUN_LOG 正常写入，随后提交插件显示 `Working tree clean. Nothing to commit.`。插件 v5 源码在 dirty-check/add 两处均用 `read -r -a ... <<< "$INPUT_FILE_PATTERN"`，只读取第一行。这解释了图片和 JSON 一直更新、DB 与权重长期丢失的现象。
+- predict/evaluate/backtest/reflect 的清单统一使用 YAML `>-`；可选归档日志用 `docs/RUN_LOG*.jsonl`。临时 Git 仓库复现验证了旧配置漏存，修复后数据库、两份权重、概率缓存和日志全部可暂存。
+- heartbeat run `38357867751` 失败的直接原因：无 checkout 时 `gh workflow run` 没有 `--repo`，报 `not a git repository`；已为 dispatch 和诊断 run list 显式传入仓库。
+- 历史补算须严格按时间顺序：预测只用目标期之前的开奖，先提交其他模型预测供 ensemble 读取，全部预测完成后再核对该期，防止集成权重读取该期结果。
+- 本地同时加载 PyTorch/XGBoost 会发生 OpenMP 崩溃；本次运维补算把原生 XGBoost 训练隔离到子进程，未改模型算法或训练轮数。
+
+- 本次恢复完成：26059–26116 共 58 期，每期 9 模型各 1 注，新增 522 条预测和 522 条核对结果；LSTM/Transformer/XGBoost 已更新到 26116。26117 留待用户触发，旧的孤立 26117 图片已移除。
 
 ### [2026-05-27 15:18 Claude Opus 4.7 1M] heartbeat 过滤失效 + 吞错误：39h 静默断链根因
 
