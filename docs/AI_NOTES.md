@@ -119,7 +119,7 @@ git log --since="7 days ago" --oneline -- docs/RUN_LOG.jsonl
 - 历史补算须严格按时间顺序：预测只用目标期之前的开奖，先提交其他模型预测供 ensemble 读取，全部预测完成后再核对该期，防止集成权重读取该期结果。
 - 本地同时加载 PyTorch/XGBoost 会发生 OpenMP 崩溃；本次运维补算把原生 XGBoost 训练隔离到子进程，未改模型算法或训练轮数。
 
-- 发布状态：恢复数据已推送 main（`521d8bf`）。5 个工作流修复已验证，但当前 GitHub OAuth 凭据没有 `workflow` scope，GitHub 连接也拒绝写入；修复仍保留在本地工作区，尚未上线。下次预测前应先完成具备 workflow 权限的授权，否则新预测/权重仍有无法持久化的风险。
+- 发布状态：恢复数据已推送 main（`521d8bf`）。2026-10-14 用户完成 GitHub CLI 的 `workflow` 授权，5 个工作流保存/心跳修复随本次提交上线。Git 推送须使用新授权的 `gh auth git-credential` helper，避免 `~/.git-credentials` 中的旧令牌仍缺 workflow scope。
 - 本次恢复完成：26059–26116 共 58 期，每期 9 模型各 1 注，新增 522 条预测和 522 条核对结果；LSTM/Transformer/XGBoost 已更新到 26116。26117 留待用户触发，旧的孤立 26117 图片已移除。
 
 ### [2026-05-27 15:18 Claude Opus 4.7 1M] heartbeat 过滤失效 + 吞错误：39h 静默断链根因

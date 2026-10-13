@@ -52,6 +52,7 @@ jobs:
           # workflow 显示 success 但 backtest 实际没启动（5/26-5/27 表面上 6 次心跳全绿，
           # 实际事件链已死）。修复：dispatch 失败 → step failure 可见，并打印 debug 信息。
           if gh workflow run backtest.yml \
+              --repo "$REPO" \
               --ref main \
               -f start="-200" \
               -f force=false \
@@ -64,6 +65,6 @@ jobs:
             echo "[hb] === gh auth status ==="
             gh auth status 2>&1 || true
             echo "[hb] === 最近 3 次 backtest run（验证 token 是否能读 runs） ==="
-            gh run list --workflow=backtest.yml --limit 3 2>&1 || true
+            gh run list --repo "$REPO" --workflow=backtest.yml --limit 3 2>&1 || true
             exit 1
           fi

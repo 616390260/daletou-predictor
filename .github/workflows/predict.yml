@@ -78,14 +78,13 @@ jobs:
           python -m backend.src.utils.run_log --workflow predict --outcome "${{ job.status }}" --extra-json "$EXTRA"
 
       # --- 4) 先把图和数据库一起 commit，确保 CDN 可访问 ---
-      # file_pattern 必须写成多行（| 字面量），单行空格分隔会被 action 拼成一个 git add，
-      # 只要任一 pattern 不匹配（例如 docs/RUN_LOG.archive.jsonl 还没达到轮转阈值）整个 step 就 128 退出，
-      # 导致后面的 Notify / 通知链 全部 skip——这是实际让预测/开奖通知「全无」的历史根因
+      # v5 reads only the first line of file_pattern; fold paths into one line.
+      # Match optional archived logs with the same glob as the active log.
       - name: Commit charts + db (before notify)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(data): update db & charts before notify"
-          file_pattern: |
+          file_pattern: >-
             data/img/*.png
             data/daletou.db
             data/lstm_state.pt
@@ -93,8 +92,7 @@ jobs:
             data/transformer_state.pt
             data/transformer_meta.json
             data/xgboost_probs.npz
-            docs/RUN_LOG.jsonl
-            docs/RUN_LOG.archive.jsonl
+            docs/RUN_LOG*.jsonl
 
       # --- 5) 等几秒让 raw.githubusercontent CDN 更新 ---
       - name: Wait for CDN

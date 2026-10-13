@@ -108,7 +108,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(backtest): walk-forward ${{ inputs.start }} progress"
-          file_pattern: |
+          file_pattern: >-
             data/daletou.db
             data/export/*.json
             data/img/*.png
@@ -118,8 +118,7 @@ jobs:
             data/transformer_state.pt
             data/transformer_meta.json
             data/xgboost_probs.npz
-            docs/RUN_LOG.jsonl
-            docs/RUN_LOG.archive.jsonl
+            docs/RUN_LOG*.jsonl
 
       - name: Decide whether to notify (reduce spam)
         if: always()
