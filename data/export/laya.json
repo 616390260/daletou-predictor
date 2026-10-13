@@ -1329,6 +1329,65 @@
   },
   "decisions": [
     {
+      "issue": "26117",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        2,
+        7,
+        12,
+        15,
+        21
+      ],
+      "back": [
+        9,
+        10
+      ],
+      "score": 0.2685,
+      "model_version": "daletou-decision-v1",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0495
+        },
+        {
+          "model": "frequency",
+          "score": 0.0388
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0471
+        },
+        {
+          "model": "markov",
+          "score": 0.0517
+        },
+        {
+          "model": "xgboost",
+          "score": 0.2685
+        },
+        {
+          "model": "lstm",
+          "score": 0.0298
+        },
+        {
+          "model": "transformer",
+          "score": 0.0531
+        },
+        {
+          "model": "genetic",
+          "score": 0.0837
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0674
+        }
+      ],
+      "trained_through_issue": "26116",
+      "kind": "prospective",
+      "result": null
+    },
+    {
       "issue": "26116",
       "selected_model": "xgboost",
       "label": "XGBoost",
@@ -1969,7 +2028,7 @@
       "trained_through_issue": "26098"
     }
   ],
-  "generated_at": "2026-10-13T18:11:03+00:00",
+  "generated_at": "2026-10-13T18:59:50+00:00",
   "active_model": {
     "version": "daletou-decision-v1",
     "model_path": "~/laya-lab/models/daletou-decision-v1",
