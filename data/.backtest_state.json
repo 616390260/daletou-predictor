@@ -1,21 +1,11 @@
 {
   "done": true,
   "stopped_early": false,
-  "processed": 2923,
-  "total": 2923,
-  "skipped_draws_this_run": 2923,
+  "processed": 50,
+  "total": 50,
+  "skipped_draws_this_run": 50,
   "last_issue": "26116",
-  "start_idx": 11,
-  "models": [
-    "random",
-    "frequency",
-    "bayesian",
-    "markov",
-    "xgboost",
-    "lstm",
-    "transformer",
-    "genetic",
-    "ensemble"
-  ],
-  "elapsed_seconds": 0.3
+  "start_idx": 2884,
+  "models": [],
+  "elapsed_seconds": 0.0
 }
