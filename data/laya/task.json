@@ -1,0 +1,12 @@
+{
+  "name": "daletou-decision",
+  "description": "仅使用开奖前信息评审原九模型候选；输出为模型评分。",
+  "question": {
+    "type": "choice",
+    "instructions": "仅基于开奖前的候选与历史状态，评估候选在目标期的中奖倾向。",
+    "criteria": {
+      "A": "目标期该注中奖",
+      "B": "目标期该注未中奖"
+    }
+  }
+}

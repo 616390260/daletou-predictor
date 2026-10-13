@@ -1,0 +1,45 @@
+{
+  "encoder": "jhu-clsp/mmBERT-base",
+  "head_layers": 2,
+  "max_len": 1024,
+  "head_max_len": 256,
+  "max_prefixes": 6,
+  "act_costs": {
+    "escalate": 0.5
+  },
+  "cost_wrong_act": 3.0,
+  "amp_dtype": "bf16",
+  "model_name": "laya-daletou-decision",
+  "temperature": [
+    1.93378484249115,
+    1.0,
+    1.0
+  ],
+  "training": {
+    "updates": 15987,
+    "epochs_completed": 4,
+    "hours": 4.97,
+    "world_size": 1,
+    "fine_tuned_from_checkpoint": false
+  },
+  "gradient_checkpointing": true,
+  "adapter_type": "head-only",
+  "base_model_path": "~/laya-lab/hf/hub/models--convaiinnovations--laya-multilingual/snapshots/e4e9ddf21a7b1903b7acffd8814ad4307bf63a67",
+  "base_checkpoint_sha256": "9d628fd971b700382ac6f65920a86f149777b2e748e0c955fb3b19695aa8f204",
+  "fine_tuned": true,
+  "task": {
+    "name": "daletou-decision",
+    "description": "仅使用开奖前信息评审原九模型候选；输出为模型评分。",
+    "question": {
+      "type": "choice",
+      "instructions": "仅基于开奖前的候选与历史状态，评估候选在目标期的中奖倾向。",
+      "criteria": {
+        "A": "目标期该注中奖",
+        "B": "目标期该注未中奖"
+      }
+    }
+  },
+  "version": "daletou-decision-v1",
+  "trained_through_issue": "26116",
+  "source_sha256": "d05641d90e09cc02caf5ee77e7ae2b314bccb1a1d5722587b9fbb02f254e39bc"
+}

@@ -1,0 +1,15 @@
+{
+  "version": "daletou-decision-v1",
+  "model_path": "~/laya-lab/models/daletou-decision-v1",
+  "trained_through_issue": "26116",
+  "source_split": "all",
+  "source_samples": 522,
+  "epochs": 4,
+  "source_sha256": "d05641d90e09cc02caf5ee77e7ae2b314bccb1a1d5722587b9fbb02f254e39bc",
+  "checkpoint_sha256": "81f8ae59a1eff4d228dfeac5d99947cbbd8cdb1f1102c81827eba7f47885dcdb",
+  "training_strategy": "head-only; shared multilingual encoder frozen",
+  "base_checkpoint_sha256": "9d628fd971b700382ac6f65920a86f149777b2e748e0c955fb3b19695aa8f204",
+  "elapsed_seconds": 77.0,
+  "created_at": "2026-10-13T18:11:03+00:00",
+  "calibration_policy": "Internal calibration uses only the training source; temporal holdouts remain independent"
+}

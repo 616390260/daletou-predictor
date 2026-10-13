@@ -1,0 +1,2 @@
+# Optional local decision runtime; GitHub Actions keeps the core requirements.
+laya==0.3.21

@@ -1,0 +1,5 @@
+可训练样本 64/64
+训练 54 条 / 校准留出 10 条 | 1 轮 | 设备 mps
+=== 第 1/1 轮完成 3s 平均 loss 0.3659
+校准温度(choice): 0.102
+已保存到 /Users/zjn/laya-lab/models/daletou-smoke-v1 总用时 4s

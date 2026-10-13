@@ -1,0 +1,1989 @@
+{
+  "status": "experimental",
+  "label": "Laya 独立决策",
+  "dataset": {
+    "issues": 58,
+    "tickets": 522,
+    "verified_start_issue": "26059",
+    "verified_end_issue": "26116",
+    "verified_ranges": [
+      {
+        "start_issue": "26059",
+        "end_issue": "26116"
+      }
+    ],
+    "split_issues": {
+      "train": [
+        "26059",
+        "26060",
+        "26061",
+        "26062",
+        "26063",
+        "26064",
+        "26065",
+        "26066",
+        "26067",
+        "26068",
+        "26069",
+        "26070",
+        "26071",
+        "26072",
+        "26073",
+        "26074",
+        "26075",
+        "26076",
+        "26077",
+        "26078",
+        "26079",
+        "26080",
+        "26081",
+        "26082",
+        "26083",
+        "26084",
+        "26085",
+        "26086",
+        "26087",
+        "26088",
+        "26089",
+        "26090",
+        "26091",
+        "26092",
+        "26093",
+        "26094",
+        "26095",
+        "26096",
+        "26097",
+        "26098"
+      ],
+      "validation": [
+        "26099",
+        "26100",
+        "26101",
+        "26102",
+        "26103",
+        "26104",
+        "26105",
+        "26106"
+      ],
+      "test": [
+        "26107",
+        "26108",
+        "26109",
+        "26110",
+        "26111",
+        "26112",
+        "26113",
+        "26114",
+        "26115",
+        "26116"
+      ]
+    },
+    "split_counts": {
+      "train": 360,
+      "validation": 72,
+      "test": 90
+    },
+    "cutoffs": {
+      "train": {
+        "first_issue": "26059",
+        "last_issue": "26098"
+      },
+      "validation": {
+        "first_issue": "26099",
+        "last_issue": "26106"
+      },
+      "test": {
+        "first_issue": "26107",
+        "last_issue": "26116"
+      }
+    },
+    "feature_version": "daletou-pre-draw-v1",
+    "dataset_sha256": "d05641d90e09cc02caf5ee77e7ae2b314bccb1a1d5722587b9fbb02f254e39bc"
+  },
+  "validation": {
+    "issues": 8,
+    "tickets": 8,
+    "wins": 1,
+    "cost": 16,
+    "prize": 5,
+    "roi": -0.6875,
+    "brier": 0.08789323041666668,
+    "constant_baseline_brier": 0.08789351851851859,
+    "candidate_samples": 72,
+    "train_win_rate": 0.08611111111111111,
+    "win_recall_at_half": 0.0,
+    "baselines": {
+      "random_selection": {
+        "issues": 8,
+        "tickets": 8,
+        "wins": 1,
+        "cost": 16,
+        "prize": 5,
+        "roi": -0.6875
+      },
+      "random": {
+        "issues": 8,
+        "tickets": 8,
+        "wins": 1,
+        "cost": 16,
+        "prize": 5,
+        "roi": -0.6875
+      },
+      "ensemble": {
+        "issues": 8,
+        "tickets": 8,
+        "wins": 0,
+        "cost": 16,
+        "prize": 0,
+        "roi": -1.0
+      }
+    },
+    "promotion_eligible": false,
+    "decisions": [
+      {
+        "issue": "26099",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          7,
+          13,
+          18,
+          22
+        ],
+        "back": [
+          9,
+          10
+        ],
+        "score": 0.2294,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.1012
+          },
+          {
+            "model": "frequency",
+            "score": 0.1308
+          },
+          {
+            "model": "bayesian",
+            "score": 0.1017
+          },
+          {
+            "model": "markov",
+            "score": 0.0812
+          },
+          {
+            "model": "xgboost",
+            "score": 0.2294
+          },
+          {
+            "model": "lstm",
+            "score": 0.0621
+          },
+          {
+            "model": "transformer",
+            "score": 0.0942
+          },
+          {
+            "model": "genetic",
+            "score": 0.1167
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0878
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 1,
+          "level": null,
+          "amount": 0
+        }
+      },
+      {
+        "issue": "26100",
+        "selected_model": "frequency",
+        "label": "频率统计",
+        "front": [
+          5,
+          7,
+          19,
+          24,
+          31
+        ],
+        "back": [
+          6,
+          7
+        ],
+        "score": 0.1256,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.112
+          },
+          {
+            "model": "frequency",
+            "score": 0.1256
+          },
+          {
+            "model": "bayesian",
+            "score": 0.084
+          },
+          {
+            "model": "markov",
+            "score": 0.1193
+          },
+          {
+            "model": "xgboost",
+            "score": 0.1195
+          },
+          {
+            "model": "lstm",
+            "score": 0.0533
+          },
+          {
+            "model": "transformer",
+            "score": 0.0824
+          },
+          {
+            "model": "genetic",
+            "score": 0.0932
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0731
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 1,
+          "level": null,
+          "amount": 0
+        }
+      },
+      {
+        "issue": "26101",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          6,
+          11,
+          16,
+          21
+        ],
+        "back": [
+          7,
+          8
+        ],
+        "score": 0.1179,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.06
+          },
+          {
+            "model": "frequency",
+            "score": 0.0999
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0702
+          },
+          {
+            "model": "markov",
+            "score": 0.0683
+          },
+          {
+            "model": "xgboost",
+            "score": 0.1179
+          },
+          {
+            "model": "lstm",
+            "score": 0.0402
+          },
+          {
+            "model": "transformer",
+            "score": 0.0792
+          },
+          {
+            "model": "genetic",
+            "score": 0.107
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0811
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        }
+      },
+      {
+        "issue": "26102",
+        "selected_model": "frequency",
+        "label": "频率统计",
+        "front": [
+          14,
+          18,
+          23,
+          32,
+          33
+        ],
+        "back": [
+          2,
+          6
+        ],
+        "score": 0.1532,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.057
+          },
+          {
+            "model": "frequency",
+            "score": 0.1532
+          },
+          {
+            "model": "bayesian",
+            "score": 0.072
+          },
+          {
+            "model": "markov",
+            "score": 0.1122
+          },
+          {
+            "model": "xgboost",
+            "score": 0.115
+          },
+          {
+            "model": "lstm",
+            "score": 0.0612
+          },
+          {
+            "model": "transformer",
+            "score": 0.0685
+          },
+          {
+            "model": "genetic",
+            "score": 0.0782
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0891
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 1,
+          "level": null,
+          "amount": 0
+        }
+      },
+      {
+        "issue": "26103",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          6,
+          9,
+          15,
+          19
+        ],
+        "back": [
+          8,
+          10
+        ],
+        "score": 0.2009,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0995
+          },
+          {
+            "model": "frequency",
+            "score": 0.1188
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0562
+          },
+          {
+            "model": "markov",
+            "score": 0.1109
+          },
+          {
+            "model": "xgboost",
+            "score": 0.2009
+          },
+          {
+            "model": "lstm",
+            "score": 0.0647
+          },
+          {
+            "model": "transformer",
+            "score": 0.0816
+          },
+          {
+            "model": "genetic",
+            "score": 0.0748
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0823
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        }
+      },
+      {
+        "issue": "26104",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          7,
+          13,
+          17,
+          21
+        ],
+        "back": [
+          8,
+          9
+        ],
+        "score": 0.1874,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0668
+          },
+          {
+            "model": "frequency",
+            "score": 0.1041
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0568
+          },
+          {
+            "model": "markov",
+            "score": 0.1088
+          },
+          {
+            "model": "xgboost",
+            "score": 0.1874
+          },
+          {
+            "model": "lstm",
+            "score": 0.0298
+          },
+          {
+            "model": "transformer",
+            "score": 0.0923
+          },
+          {
+            "model": "genetic",
+            "score": 0.1414
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0753
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 2,
+          "level": "九等奖",
+          "amount": 5
+        }
+      },
+      {
+        "issue": "26105",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          6,
+          10,
+          17,
+          21
+        ],
+        "back": [
+          7,
+          9
+        ],
+        "score": 0.1952,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0741
+          },
+          {
+            "model": "frequency",
+            "score": 0.1418
+          },
+          {
+            "model": "bayesian",
+            "score": 0.074
+          },
+          {
+            "model": "markov",
+            "score": 0.0841
+          },
+          {
+            "model": "xgboost",
+            "score": 0.1952
+          },
+          {
+            "model": "lstm",
+            "score": 0.0513
+          },
+          {
+            "model": "transformer",
+            "score": 0.0975
+          },
+          {
+            "model": "genetic",
+            "score": 0.0991
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0979
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 1,
+          "level": null,
+          "amount": 0
+        }
+      },
+      {
+        "issue": "26106",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          7,
+          12,
+          14,
+          19
+        ],
+        "back": [
+          7,
+          9
+        ],
+        "score": 0.1979,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.056
+          },
+          {
+            "model": "frequency",
+            "score": 0.087
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0734
+          },
+          {
+            "model": "markov",
+            "score": 0.0823
+          },
+          {
+            "model": "xgboost",
+            "score": 0.1979
+          },
+          {
+            "model": "lstm",
+            "score": 0.059
+          },
+          {
+            "model": "transformer",
+            "score": 0.0819
+          },
+          {
+            "model": "genetic",
+            "score": 0.0886
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0833
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        }
+      }
+    ]
+  },
+  "evaluation": {
+    "issues": 10,
+    "tickets": 10,
+    "wins": 1,
+    "cost": 20,
+    "prize": 5,
+    "roi": -0.75,
+    "brier": 0.10519496244444443,
+    "constant_baseline_brier": 0.09939043209876534,
+    "candidate_samples": 90,
+    "train_win_rate": 0.08611111111111111,
+    "win_recall_at_half": 0.0,
+    "baselines": {
+      "random_selection": {
+        "issues": 10,
+        "tickets": 10,
+        "wins": 3,
+        "cost": 20,
+        "prize": 15,
+        "roi": -0.25
+      },
+      "random": {
+        "issues": 10,
+        "tickets": 10,
+        "wins": 2,
+        "cost": 20,
+        "prize": 10,
+        "roi": -0.5
+      },
+      "ensemble": {
+        "issues": 10,
+        "tickets": 10,
+        "wins": 1,
+        "cost": 20,
+        "prize": 5,
+        "roi": -0.75
+      }
+    },
+    "promotion_eligible": false,
+    "model_version": "daletou-evaluation-v1",
+    "trained_through_issue": "26098",
+    "decisions": [
+      {
+        "issue": "26107",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          7,
+          14,
+          18,
+          23
+        ],
+        "back": [
+          8,
+          10
+        ],
+        "score": 0.3186,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0872
+          },
+          {
+            "model": "frequency",
+            "score": 0.086
+          },
+          {
+            "model": "bayesian",
+            "score": 0.067
+          },
+          {
+            "model": "markov",
+            "score": 0.0721
+          },
+          {
+            "model": "xgboost",
+            "score": 0.3186
+          },
+          {
+            "model": "lstm",
+            "score": 0.0536
+          },
+          {
+            "model": "transformer",
+            "score": 0.0793
+          },
+          {
+            "model": "genetic",
+            "score": 0.1116
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0767
+          }
+        ],
+        "result": {
+          "front_hit": 2,
+          "back_hit": 1,
+          "level": "九等奖",
+          "amount": 5
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26108",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          6,
+          14,
+          16,
+          21
+        ],
+        "back": [
+          8,
+          10
+        ],
+        "score": 0.2177,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.1235
+          },
+          {
+            "model": "frequency",
+            "score": 0.1091
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0705
+          },
+          {
+            "model": "markov",
+            "score": 0.0529
+          },
+          {
+            "model": "xgboost",
+            "score": 0.2177
+          },
+          {
+            "model": "lstm",
+            "score": 0.037
+          },
+          {
+            "model": "transformer",
+            "score": 0.0806
+          },
+          {
+            "model": "genetic",
+            "score": 0.1322
+          },
+          {
+            "model": "ensemble",
+            "score": 0.1113
+          }
+        ],
+        "result": {
+          "front_hit": 2,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26109",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          5,
+          11,
+          16,
+          19
+        ],
+        "back": [
+          8,
+          9
+        ],
+        "score": 0.3297,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.1031
+          },
+          {
+            "model": "frequency",
+            "score": 0.1307
+          },
+          {
+            "model": "bayesian",
+            "score": 0.1288
+          },
+          {
+            "model": "markov",
+            "score": 0.066
+          },
+          {
+            "model": "xgboost",
+            "score": 0.3297
+          },
+          {
+            "model": "lstm",
+            "score": 0.0444
+          },
+          {
+            "model": "transformer",
+            "score": 0.1057
+          },
+          {
+            "model": "genetic",
+            "score": 0.1462
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0997
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 1,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26110",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          7,
+          11,
+          15,
+          20
+        ],
+        "back": [
+          9,
+          10
+        ],
+        "score": 0.3592,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0556
+          },
+          {
+            "model": "frequency",
+            "score": 0.1303
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0927
+          },
+          {
+            "model": "markov",
+            "score": 0.0847
+          },
+          {
+            "model": "xgboost",
+            "score": 0.3592
+          },
+          {
+            "model": "lstm",
+            "score": 0.0508
+          },
+          {
+            "model": "transformer",
+            "score": 0.1189
+          },
+          {
+            "model": "genetic",
+            "score": 0.1027
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0664
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 1,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26111",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          1,
+          7,
+          12,
+          17,
+          21
+        ],
+        "back": [
+          8,
+          9
+        ],
+        "score": 0.2761,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0957
+          },
+          {
+            "model": "frequency",
+            "score": 0.2193
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0905
+          },
+          {
+            "model": "markov",
+            "score": 0.0637
+          },
+          {
+            "model": "xgboost",
+            "score": 0.2761
+          },
+          {
+            "model": "lstm",
+            "score": 0.0371
+          },
+          {
+            "model": "transformer",
+            "score": 0.0714
+          },
+          {
+            "model": "genetic",
+            "score": 0.1111
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0973
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26112",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          2,
+          7,
+          12,
+          15,
+          20
+        ],
+        "back": [
+          9,
+          10
+        ],
+        "score": 0.2281,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0764
+          },
+          {
+            "model": "frequency",
+            "score": 0.1347
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0762
+          },
+          {
+            "model": "markov",
+            "score": 0.0839
+          },
+          {
+            "model": "xgboost",
+            "score": 0.2281
+          },
+          {
+            "model": "lstm",
+            "score": 0.0449
+          },
+          {
+            "model": "transformer",
+            "score": 0.0825
+          },
+          {
+            "model": "genetic",
+            "score": 0.1189
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0613
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 1,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26113",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          3,
+          10,
+          20,
+          22,
+          23
+        ],
+        "back": [
+          5,
+          12
+        ],
+        "score": 0.1432,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.086
+          },
+          {
+            "model": "frequency",
+            "score": 0.1019
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0769
+          },
+          {
+            "model": "markov",
+            "score": 0.0689
+          },
+          {
+            "model": "xgboost",
+            "score": 0.1432
+          },
+          {
+            "model": "lstm",
+            "score": 0.045
+          },
+          {
+            "model": "transformer",
+            "score": 0.1033
+          },
+          {
+            "model": "genetic",
+            "score": 0.0832
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0794
+          }
+        ],
+        "result": {
+          "front_hit": 1,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26114",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          2,
+          7,
+          14,
+          18,
+          22
+        ],
+        "back": [
+          7,
+          8
+        ],
+        "score": 0.3142,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.0488
+          },
+          {
+            "model": "frequency",
+            "score": 0.0978
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0725
+          },
+          {
+            "model": "markov",
+            "score": 0.0837
+          },
+          {
+            "model": "xgboost",
+            "score": 0.3142
+          },
+          {
+            "model": "lstm",
+            "score": 0.0574
+          },
+          {
+            "model": "transformer",
+            "score": 0.0911
+          },
+          {
+            "model": "genetic",
+            "score": 0.1189
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0706
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26115",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          2,
+          7,
+          14,
+          19,
+          22
+        ],
+        "back": [
+          8,
+          9
+        ],
+        "score": 0.2089,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.1319
+          },
+          {
+            "model": "frequency",
+            "score": 0.0927
+          },
+          {
+            "model": "bayesian",
+            "score": 0.07
+          },
+          {
+            "model": "markov",
+            "score": 0.0888
+          },
+          {
+            "model": "xgboost",
+            "score": 0.2089
+          },
+          {
+            "model": "lstm",
+            "score": 0.0666
+          },
+          {
+            "model": "transformer",
+            "score": 0.1091
+          },
+          {
+            "model": "genetic",
+            "score": 0.089
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0882
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      },
+      {
+        "issue": "26116",
+        "selected_model": "xgboost",
+        "label": "XGBoost",
+        "front": [
+          2,
+          6,
+          12,
+          15,
+          21
+        ],
+        "back": [
+          8,
+          9
+        ],
+        "score": 0.2047,
+        "kind": "heldout",
+        "candidate_scores": [
+          {
+            "model": "random",
+            "score": 0.1309
+          },
+          {
+            "model": "frequency",
+            "score": 0.1062
+          },
+          {
+            "model": "bayesian",
+            "score": 0.0554
+          },
+          {
+            "model": "markov",
+            "score": 0.0849
+          },
+          {
+            "model": "xgboost",
+            "score": 0.2047
+          },
+          {
+            "model": "lstm",
+            "score": 0.0728
+          },
+          {
+            "model": "transformer",
+            "score": 0.0916
+          },
+          {
+            "model": "genetic",
+            "score": 0.1728
+          },
+          {
+            "model": "ensemble",
+            "score": 0.0903
+          }
+        ],
+        "result": {
+          "front_hit": 0,
+          "back_hit": 0,
+          "level": null,
+          "amount": 0
+        },
+        "model_version": "daletou-evaluation-v1",
+        "trained_through_issue": "26098"
+      }
+    ],
+    "limitations": [
+      "有效测试仅为按期分组的少量开奖记录，尚不足以证明稳定优势。",
+      "Laya 评分不等同于可靠中奖概率，不自动干预原有 9 个模型。",
+      "收益按项目统一固定奖金额估算，历史选票属于冻结回测。"
+    ]
+  },
+  "decisions": [
+    {
+      "issue": "26116",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        2,
+        6,
+        12,
+        15,
+        21
+      ],
+      "back": [
+        8,
+        9
+      ],
+      "score": 0.2047,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.1309
+        },
+        {
+          "model": "frequency",
+          "score": 0.1062
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0554
+        },
+        {
+          "model": "markov",
+          "score": 0.0849
+        },
+        {
+          "model": "xgboost",
+          "score": 0.2047
+        },
+        {
+          "model": "lstm",
+          "score": 0.0728
+        },
+        {
+          "model": "transformer",
+          "score": 0.0916
+        },
+        {
+          "model": "genetic",
+          "score": 0.1728
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0903
+        }
+      ],
+      "result": {
+        "front_hit": 0,
+        "back_hit": 0,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26115",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        2,
+        7,
+        14,
+        19,
+        22
+      ],
+      "back": [
+        8,
+        9
+      ],
+      "score": 0.2089,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.1319
+        },
+        {
+          "model": "frequency",
+          "score": 0.0927
+        },
+        {
+          "model": "bayesian",
+          "score": 0.07
+        },
+        {
+          "model": "markov",
+          "score": 0.0888
+        },
+        {
+          "model": "xgboost",
+          "score": 0.2089
+        },
+        {
+          "model": "lstm",
+          "score": 0.0666
+        },
+        {
+          "model": "transformer",
+          "score": 0.1091
+        },
+        {
+          "model": "genetic",
+          "score": 0.089
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0882
+        }
+      ],
+      "result": {
+        "front_hit": 0,
+        "back_hit": 0,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26114",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        2,
+        7,
+        14,
+        18,
+        22
+      ],
+      "back": [
+        7,
+        8
+      ],
+      "score": 0.3142,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0488
+        },
+        {
+          "model": "frequency",
+          "score": 0.0978
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0725
+        },
+        {
+          "model": "markov",
+          "score": 0.0837
+        },
+        {
+          "model": "xgboost",
+          "score": 0.3142
+        },
+        {
+          "model": "lstm",
+          "score": 0.0574
+        },
+        {
+          "model": "transformer",
+          "score": 0.0911
+        },
+        {
+          "model": "genetic",
+          "score": 0.1189
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0706
+        }
+      ],
+      "result": {
+        "front_hit": 0,
+        "back_hit": 0,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26113",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        3,
+        10,
+        20,
+        22,
+        23
+      ],
+      "back": [
+        5,
+        12
+      ],
+      "score": 0.1432,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.086
+        },
+        {
+          "model": "frequency",
+          "score": 0.1019
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0769
+        },
+        {
+          "model": "markov",
+          "score": 0.0689
+        },
+        {
+          "model": "xgboost",
+          "score": 0.1432
+        },
+        {
+          "model": "lstm",
+          "score": 0.045
+        },
+        {
+          "model": "transformer",
+          "score": 0.1033
+        },
+        {
+          "model": "genetic",
+          "score": 0.0832
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0794
+        }
+      ],
+      "result": {
+        "front_hit": 1,
+        "back_hit": 0,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26112",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        2,
+        7,
+        12,
+        15,
+        20
+      ],
+      "back": [
+        9,
+        10
+      ],
+      "score": 0.2281,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0764
+        },
+        {
+          "model": "frequency",
+          "score": 0.1347
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0762
+        },
+        {
+          "model": "markov",
+          "score": 0.0839
+        },
+        {
+          "model": "xgboost",
+          "score": 0.2281
+        },
+        {
+          "model": "lstm",
+          "score": 0.0449
+        },
+        {
+          "model": "transformer",
+          "score": 0.0825
+        },
+        {
+          "model": "genetic",
+          "score": 0.1189
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0613
+        }
+      ],
+      "result": {
+        "front_hit": 0,
+        "back_hit": 1,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26111",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        1,
+        7,
+        12,
+        17,
+        21
+      ],
+      "back": [
+        8,
+        9
+      ],
+      "score": 0.2761,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0957
+        },
+        {
+          "model": "frequency",
+          "score": 0.2193
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0905
+        },
+        {
+          "model": "markov",
+          "score": 0.0637
+        },
+        {
+          "model": "xgboost",
+          "score": 0.2761
+        },
+        {
+          "model": "lstm",
+          "score": 0.0371
+        },
+        {
+          "model": "transformer",
+          "score": 0.0714
+        },
+        {
+          "model": "genetic",
+          "score": 0.1111
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0973
+        }
+      ],
+      "result": {
+        "front_hit": 1,
+        "back_hit": 0,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26110",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        1,
+        7,
+        11,
+        15,
+        20
+      ],
+      "back": [
+        9,
+        10
+      ],
+      "score": 0.3592,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0556
+        },
+        {
+          "model": "frequency",
+          "score": 0.1303
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0927
+        },
+        {
+          "model": "markov",
+          "score": 0.0847
+        },
+        {
+          "model": "xgboost",
+          "score": 0.3592
+        },
+        {
+          "model": "lstm",
+          "score": 0.0508
+        },
+        {
+          "model": "transformer",
+          "score": 0.1189
+        },
+        {
+          "model": "genetic",
+          "score": 0.1027
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0664
+        }
+      ],
+      "result": {
+        "front_hit": 0,
+        "back_hit": 1,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26109",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        1,
+        5,
+        11,
+        16,
+        19
+      ],
+      "back": [
+        8,
+        9
+      ],
+      "score": 0.3297,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.1031
+        },
+        {
+          "model": "frequency",
+          "score": 0.1307
+        },
+        {
+          "model": "bayesian",
+          "score": 0.1288
+        },
+        {
+          "model": "markov",
+          "score": 0.066
+        },
+        {
+          "model": "xgboost",
+          "score": 0.3297
+        },
+        {
+          "model": "lstm",
+          "score": 0.0444
+        },
+        {
+          "model": "transformer",
+          "score": 0.1057
+        },
+        {
+          "model": "genetic",
+          "score": 0.1462
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0997
+        }
+      ],
+      "result": {
+        "front_hit": 1,
+        "back_hit": 1,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26108",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        1,
+        6,
+        14,
+        16,
+        21
+      ],
+      "back": [
+        8,
+        10
+      ],
+      "score": 0.2177,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.1235
+        },
+        {
+          "model": "frequency",
+          "score": 0.1091
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0705
+        },
+        {
+          "model": "markov",
+          "score": 0.0529
+        },
+        {
+          "model": "xgboost",
+          "score": 0.2177
+        },
+        {
+          "model": "lstm",
+          "score": 0.037
+        },
+        {
+          "model": "transformer",
+          "score": 0.0806
+        },
+        {
+          "model": "genetic",
+          "score": 0.1322
+        },
+        {
+          "model": "ensemble",
+          "score": 0.1113
+        }
+      ],
+      "result": {
+        "front_hit": 2,
+        "back_hit": 0,
+        "level": null,
+        "amount": 0
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    },
+    {
+      "issue": "26107",
+      "selected_model": "xgboost",
+      "label": "XGBoost",
+      "front": [
+        1,
+        7,
+        14,
+        18,
+        23
+      ],
+      "back": [
+        8,
+        10
+      ],
+      "score": 0.3186,
+      "kind": "heldout",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0872
+        },
+        {
+          "model": "frequency",
+          "score": 0.086
+        },
+        {
+          "model": "bayesian",
+          "score": 0.067
+        },
+        {
+          "model": "markov",
+          "score": 0.0721
+        },
+        {
+          "model": "xgboost",
+          "score": 0.3186
+        },
+        {
+          "model": "lstm",
+          "score": 0.0536
+        },
+        {
+          "model": "transformer",
+          "score": 0.0793
+        },
+        {
+          "model": "genetic",
+          "score": 0.1116
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0767
+        }
+      ],
+      "result": {
+        "front_hit": 2,
+        "back_hit": 1,
+        "level": "九等奖",
+        "amount": 5
+      },
+      "model_version": "daletou-evaluation-v1",
+      "trained_through_issue": "26098"
+    }
+  ],
+  "generated_at": "2026-10-13T18:11:03+00:00",
+  "active_model": {
+    "version": "daletou-decision-v1",
+    "model_path": "~/laya-lab/models/daletou-decision-v1",
+    "trained_through_issue": "26116",
+    "source_split": "all",
+    "source_samples": 522,
+    "epochs": 4,
+    "source_sha256": "d05641d90e09cc02caf5ee77e7ae2b314bccb1a1d5722587b9fbb02f254e39bc",
+    "checkpoint_sha256": "81f8ae59a1eff4d228dfeac5d99947cbbd8cdb1f1102c81827eba7f47885dcdb",
+    "training_strategy": "head-only; shared multilingual encoder frozen",
+    "base_checkpoint_sha256": "9d628fd971b700382ac6f65920a86f149777b2e748e0c955fb3b19695aa8f204",
+    "elapsed_seconds": 77.0,
+    "created_at": "2026-10-13T18:11:03+00:00",
+    "calibration_policy": "Internal calibration uses only the training source; temporal holdouts remain independent"
+  },
+  "trained_through_issue": "26116"
+}

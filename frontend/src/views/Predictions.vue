@@ -5,10 +5,29 @@
       <p>每期每个模型给出 1 注投注。绿圈 = 命中号码，未开奖期标记为"待开奖"。</p>
     </div>
 
+    <section v-if="laya" class="card laya-overview" aria-labelledby="laya-title">
+      <h2 id="laya-title">Laya 独立决策 · 实验中</h2>
+      <dl class="laya-facts">
+        <div>
+          <dt>可信历史样本</dt>
+          <dd>{{ laya.dataset?.issues ?? "—" }} 期 / {{ laya.dataset?.tickets ?? "—" }} 候选</dd>
+        </div>
+        <div>
+          <dt>冻结测试</dt>
+          <dd>{{ laya.evaluation?.issues ?? "—" }} 期</dd>
+        </div>
+        <div>
+          <dt>部署版本训练到</dt>
+          <dd>{{ laya.active_model?.trained_through_issue || laya.trained_through_issue || "—" }} 期</dd>
+        </div>
+      </dl>
+      <p class="laya-note">评分不是可靠中奖概率，尚未参与原模型集成。历史选择按回测评审展示，不代表当时已发布预测。</p>
+    </section>
+
     <div v-if="!items.length" class="loading">加载中…</div>
 
     <div v-else class="list">
-      <article v-for="item in items" :key="item.issue" class="card issue-card">
+      <article v-for="item in displayedItems" :key="item.issue" class="card issue-card">
         <header class="issue-head">
           <div>
             <div class="issue-title">
@@ -47,17 +66,79 @@
             </div>
           </div>
         </div>
+
+        <section v-if="item.layaDecision" class="laya-decision" :aria-label="`第 ${item.issue} 期 Laya 独立决策`">
+          <div class="laya-decision-head">
+            <h2>Laya 独立决策</h2>
+            <span class="tag">{{ decisionKind(item.layaDecision.kind) }}</span>
+          </div>
+          <div class="laya-selection">
+            <span>选自</span>
+            <span class="model-badge" :data-model="item.layaDecision.selected_model">
+              {{ item.layaDecision.label || item.layaDecision.selected_model || "未知模型" }}
+            </span>
+            <span class="laya-score">模型评分 {{ fmtScore(item.layaDecision.score) }}</span>
+          </div>
+          <div class="ticket laya-ticket">
+            <BallRow
+              :front="item.layaDecision.front || []"
+              :back="item.layaDecision.back || []"
+              :hit-front="item.real?.front || []"
+              :hit-back="item.real?.back || []"
+              size="sm"
+            />
+            <span v-if="item.layaDecision.result" class="result" :class="{ win: item.layaDecision.result.amount > 0 }">
+              前区 {{ fmtHits(item.layaDecision.result.front_hit) }} / 后区 {{ fmtHits(item.layaDecision.result.back_hit) }} 命中 ·
+              {{ item.layaDecision.result.level || "未中奖" }}
+              <em v-if="item.layaDecision.result.amount > 0">+¥{{ fmtMoney(item.layaDecision.result.amount) }}</em>
+            </span>
+          </div>
+          <p class="laya-note laya-version">
+            训练截止 {{ item.layaDecision.trained_through_issue || "—" }} 期 · 版本 {{ item.layaDecision.model_version || "—" }}
+          </p>
+          <p class="laya-note">模型评分仅用于比较候选，不代表中奖概率。</p>
+        </section>
       </article>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { api } from "../api";
 import BallRow from "../components/BallRow.vue";
 
 const items = ref([]);
+const laya = ref(null);
+const displayedItems = computed(() => {
+  const decisions = new Map(
+    (Array.isArray(laya.value?.decisions) ? laya.value.decisions : [])
+      .filter((decision) => decision?.issue)
+      .map((decision) => [String(decision.issue), decision]),
+  );
+  return items.value.map((item) => ({
+    ...item,
+    layaDecision: decisions.get(String(item.issue)),
+  }));
+});
+
+function decisionKind(kind) {
+  return {
+    heldout: "冻结回测选择",
+    prospective: "本期独立选择",
+    retrospective: "历史评审",
+  }[kind] || "实验选择";
+}
+
+function fmtScore(score) {
+  return Number.isFinite(score) && score >= 0 && score <= 1
+    ? `${(score * 100).toFixed(1)}%`
+    : "—";
+}
+
+function fmtHits(hits) {
+  return Number.isInteger(hits) && hits >= 0 ? hits : "—";
+}
 
 function hasHit(m) {
   return m.tickets.some((t) => t.result && t.result.amount > 0);
@@ -76,7 +157,10 @@ function fmtMoney(n) {
 }
 
 onMounted(async () => {
-  items.value = (await api.predictions()) || [];
+  await Promise.all([
+    api.predictions().then((data) => { items.value = data || []; }),
+    api.laya().then((data) => { laya.value = data; }),
+  ]);
 });
 </script>
 
@@ -98,6 +182,81 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.laya-overview {
+  margin-bottom: 24px;
+}
+
+.laya-overview h2,
+.laya-decision h2 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.laya-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+.laya-facts dt,
+.laya-note,
+.laya-selection {
+  color: var(--text-2);
+}
+
+.laya-facts dd {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+.laya-note {
+  font-size: 12px;
+  max-width: 75ch;
+  overflow-wrap: anywhere;
+}
+
+.laya-decision {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  min-width: 0;
+}
+
+.laya-decision-head,
+.laya-selection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.laya-selection {
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.laya-score {
+  font-family: var(--font-mono);
+}
+
+.laya-ticket {
+  margin-bottom: 10px;
+}
+
+.laya-ticket .result {
+  color: var(--text-2);
+}
+
+.laya-ticket .result.win {
+  color: var(--green);
+}
+
+.laya-version {
+  margin-bottom: 4px;
 }
 
 .issue-card {
@@ -219,5 +378,25 @@ onMounted(async () => {
 .result em {
   font-style: normal;
   margin-left: 4px;
+}
+
+@media (max-width: 600px) {
+  .models {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .issue-card {
+    padding: 16px;
+  }
+
+  .issue-title,
+  .real-row {
+    flex-wrap: wrap;
+  }
+
+  .laya-ticket .result {
+    margin-left: 0;
+    width: 100%;
+  }
 }
 </style>
