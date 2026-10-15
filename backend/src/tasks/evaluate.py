@@ -5,10 +5,11 @@ from __future__ import annotations
 
 import argparse
 
-from ..config import DATA_DIR, MODEL_LABELS, MODELS, PRIZE_TABLE, TICKET_PRICE
+from ..config import DATA_DIR, MODEL_LABELS, MODELS, TICKET_PRICE
 from ..db import get_conn, init_db
 from ..utils.notifier import notify, repo_raw_url
 from ..utils.numbers import count_hits, decode
+from ..utils.prizes import PRIZE_ESTIMATE_NOTE, previous_pool, prize_for_hits
 
 
 def evaluate_issue(issue: str, notify_on_done: bool = True) -> int:
@@ -28,6 +29,7 @@ def evaluate_issue(issue: str, notify_on_done: bool = True) -> int:
             return 0
         real_front = decode(draw["front"])
         real_back = decode(draw["back"])
+        pool_before = previous_pool(conn, issue)
 
         preds = conn.execute(
             "SELECT model, ticket_idx, front, back FROM predictions WHERE issue = ?",
@@ -42,7 +44,7 @@ def evaluate_issue(issue: str, notify_on_done: bool = True) -> int:
             pf = decode(p["front"])
             pb = decode(p["back"])
             fh, bh = count_hits(pf, pb, real_front, real_back)
-            level, amount = PRIZE_TABLE.get((fh, bh), (None, 0))
+            level, amount = prize_for_hits(issue, fh, bh, pool_before)
             conn.execute(
                 """
                 INSERT OR REPLACE INTO results
@@ -157,6 +159,7 @@ def _send_evaluate_notification(issue: str) -> None:
             lines.append("")
 
     lines.append("---")
+    lines.append(f"> {PRIZE_ESTIMATE_NOTE}")
     lines.append("> 算法研究项目，仅供学习，请理性购彩 🙏")
 
     if hit_models:

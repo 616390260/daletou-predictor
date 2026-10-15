@@ -9,6 +9,7 @@ from pathlib import Path
 
 from ..config import MODELS, PRIZE_TABLE
 from ..utils.numbers import count_hits, decode
+from ..utils.prizes import previous_pool, prize_for_hits
 
 FEATURE_VERSION = "daletou-pre-draw-v1"
 TASK = {
@@ -117,6 +118,9 @@ def _jsonl(rows: list[dict]) -> str:
 def build_dataset(conn: sqlite3.Connection, log_path: Path, output_dir: Path) -> dict:
     """Verify recovery candidates and split complete issues chronologically.
 
+    V1 result amounts remain legacy estimates for frozen dataset compatibility,
+    not actual returns. Stored results may use either independently verified rule.
+
     @returns Metadata for the written all/train/validation/test JSONL files.
     """
     ranges = _verified_ranges(Path(log_path))
@@ -145,6 +149,7 @@ def build_dataset(conn: sqlite3.Connection, log_path: Path, output_dir: Path) ->
         if missing:
             raise ValueError(f"Issue {issue} is missing complete candidates/results: {','.join(missing)}")
         verified_start = next(start for start, end in ranges if start <= issue <= end)
+        pool_before = previous_pool(conn, issue)
         for model in MODELS:
             candidate, outcome = candidate_map[model], outcome_map[model]
             try:
@@ -153,7 +158,12 @@ def build_dataset(conn: sqlite3.Connection, log_path: Path, output_dir: Path) ->
                 raise ValueError(f"Issue {issue} model {model}: invalid candidate") from exc
             front_hit, back_hit = count_hits(front, back, real_front, real_back)
             level, amount = PRIZE_TABLE.get((front_hit, back_hit), (None, 0))
-            if tuple(outcome[1:]) != (front_hit, back_hit, level, amount):
+            current_level, current_amount = prize_for_hits(issue, front_hit, back_hit, pool_before)
+            valid_outcomes = {
+                (front_hit, back_hit, level, amount),
+                (front_hit, back_hit, current_level, current_amount),
+            }
+            if tuple(outcome[1:]) not in valid_outcomes:
                 raise ValueError(f"Issue {issue} model {model}: stored result differs from independent recomputation")
             won = amount > 0
             rows.append({

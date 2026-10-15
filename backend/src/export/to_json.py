@@ -24,6 +24,7 @@ from ..config import (
 )
 from ..db import get_conn, init_db
 from ..utils.numbers import decode
+from ..utils.prizes import PRIZE_ESTIMATE_NOTE
 
 
 def _write_json(name: str, data: Any) -> None:
@@ -140,6 +141,7 @@ def export_predictions(limit_issues: int = 50) -> None:
             "back_hit": r["back_hit"],
             "level": r["prize_level"],
             "amount": r["prize_amount"],
+            "amount_basis": "estimated_rule_schedule",
         }
         for r in res
     }
@@ -261,7 +263,8 @@ def export_stats() -> None:
         rate = cum_hit[key]["wins"] / cum_hit[key]["tickets"] if cum_hit[key]["tickets"] else 0
         hit_trend[key].append({"issue": r["issue"], "rate": rate})
 
-    _write_json("stats.json", {"summary": stats, "trend": trend, "hit_trend": hit_trend})
+    _write_json("stats.json", {"summary": stats, "trend": trend, "hit_trend": hit_trend,
+                              "prize_accounting": {"mode": "estimated", "description": PRIZE_ESTIMATE_NOTE}})
 
 
 def _next_draw_time(latest_date_str: str | None) -> str | None:
@@ -329,6 +332,10 @@ def export_meta() -> None:
         "lstm_incremental_replay_max": LSTM_INCREMENTAL_REPLAY_MAX,
         "backtest_min_start_index": BACKTEST_MIN_START_INDEX,
         "models": [{"key": k, "label": v} for k, v in MODEL_LABELS.items()],
+        "prize_accounting": {
+            "mode": "estimated",
+            "description": PRIZE_ESTIMATE_NOTE,
+        },
     }
     _write_json("meta.json", meta)
 
@@ -345,6 +352,8 @@ def run() -> None:
     export_stats()
     from ..analytics.significance import export_significance
     export_significance()
+    from ..portfolio.service import export_portfolios
+    export_portfolios()
     print("全部 JSON 导出完成")
 
 

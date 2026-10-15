@@ -27,6 +27,7 @@ from ..config import (
     FRONT_COUNT,
     FRONT_MAX,
     FRONT_MIN,
+    MONEY_FEATURE_VERSION,
 )
 from .base import BaseModel, Ticket
 from .lstm_model import (
@@ -142,13 +143,14 @@ class TransformerModel(BaseModel):
     def _load_meta(self) -> dict:
         if META_PATH.exists():
             try:
-                return json.loads(META_PATH.read_text())
+                meta = json.loads(META_PATH.read_text())
+                return meta if meta.get("money_feature_version") == MONEY_FEATURE_VERSION else {}
             except Exception:
                 pass
         return {}
 
     def _save_meta(self, meta: dict) -> None:
-        META_PATH.write_text(json.dumps(meta, ensure_ascii=False, indent=2))
+        META_PATH.write_text(json.dumps({**meta, "money_feature_version": MONEY_FEATURE_VERSION}, ensure_ascii=False, indent=2))
 
     def _ensure_model(self, history: pd.DataFrame) -> LotteryTransformer:
         meta = self._load_meta()

@@ -86,6 +86,45 @@ class LayaDatasetTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "26005"):
             build_dataset(self.conn, self.log, self.root / "dataset")
 
+    def _move_fixture_to_new_rule_issues(self):
+        for table in ("draws", "predictions", "results"):
+            self.conn.execute(f"UPDATE {table} SET issue=CAST(CAST(issue AS INTEGER)+20 AS TEXT)")
+        self.conn.execute("UPDATE draws SET pool=800000000")
+        self.conn.execute("UPDATE predictions SET front='01,02,03,04,06'")
+        self.conn.execute("UPDATE results SET front_hit=4,back_hit=2,prize_level='四等奖',prize_amount=3000")
+        self.conn.commit()
+        self.log.write_text(json.dumps({"outcome": "success", "extra": {
+            "recovery": True, "historical_simulation": True,
+            "start_issue": "26022", "end_issue": "26032",
+        }}) + "\n")
+
+    def test_new_rule_results_preserve_frozen_v1_dataset_digest(self):
+        self._move_fixture_to_new_rule_issues()
+        legacy = build_dataset(self.conn, self.log, self.root / "legacy")
+        self.conn.execute("UPDATE results SET prize_level='三等奖',prize_amount=6666")
+        current = build_dataset(self.conn, self.log, self.root / "current")
+        self.assertEqual(current['feature_version'], legacy['feature_version'])
+        self.assertEqual(current['dataset_sha256'], legacy['dataset_sha256'])
+        self.assertEqual((self.root / "current/all.jsonl").read_bytes(),
+                         (self.root / "legacy/all.jsonl").read_bytes())
+        row = json.loads((self.root / "current/all.jsonl").read_text().splitlines()[0])
+        self.assertEqual(row['result']['level'], '四等奖')
+        self.assertEqual(row['result']['amount'], 3000)
+
+    def test_new_rule_results_reject_corrupt_amount_even_if_still_winning(self):
+        self._move_fixture_to_new_rule_issues()
+        self.conn.execute("UPDATE results SET prize_level='三等奖',prize_amount=6666")
+        self.conn.execute("UPDATE results SET prize_amount=6667 WHERE issue='26025' AND model='random'")
+        with self.assertRaisesRegex(ValueError, "26025.*random"):
+            build_dataset(self.conn, self.log, self.root / "dataset")
+
+    def test_new_rule_results_require_exact_independent_hits(self):
+        self._move_fixture_to_new_rule_issues()
+        self.conn.execute("UPDATE results SET prize_level='三等奖',prize_amount=6666")
+        self.conn.execute("UPDATE results SET front_hit=5 WHERE issue='26022' AND model='random'")
+        with self.assertRaisesRegex(ValueError, "26022.*random"):
+            build_dataset(self.conn, self.log, self.root / "dataset")
+
     def test_unverified_results_do_not_change_history_features(self):
         args = (self.conn, "26006", "random", [1, 2, 3, 4, 5], [1, 2], "26002")
         before = build_state(*args)

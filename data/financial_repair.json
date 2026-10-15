@@ -1,0 +1,27 @@
+{
+  "source": "https://datachart.500.com/dlt/history/newinc/history.php?start=07001&end=99999",
+  "source_sha256": "d622a93bf9fd1e8682f3711a8885b322d983e7057ffadf4a9a9ebf7d6b91f696",
+  "source_hash_encoding": "decoded HTML re-encoded as UTF-8",
+  "timestamp": "2026-10-15T20:26:53.506026+00:00",
+  "database": "/Users/zjn/Desktop/ys/money/DaLeTou/data/daletou.db",
+  "applied": true,
+  "canonical_count": 2935,
+  "validated_count": 2935,
+  "updated_count": 2925,
+  "would_update_count": 2925,
+  "issue_start": "07001",
+  "issue_end": "26117",
+  "skipped_empty_source": [
+    "08098",
+    "09028",
+    "10034",
+    "11106",
+    "13017",
+    "13088",
+    "13091",
+    "13092",
+    "13093",
+    "13094"
+  ],
+  "money_feature_version": 2
+}

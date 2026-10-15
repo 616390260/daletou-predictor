@@ -44,6 +44,9 @@ def run_predict(target_issue: str | None = None, force: bool = False,
     latest_issue = history.iloc[-1]["issue"]
     issue = target_issue or next_issue_guess(latest_issue)
     existing = _existing_models_for_issue(issue)
+    if force:
+        from ..portfolio.service import assert_candidates_mutable
+        assert_candidates_mutable(issue)
 
     print(f"为期号 {issue} 生成预测（已存在: {sorted(existing) or '无'}）")
 
@@ -76,6 +79,9 @@ def run_predict(target_issue: str | None = None, force: bool = False,
             for idx, t in enumerate(tickets):
                 print(f"    注{idx + 1}: 前 {encode(t.front)}  后 {encode(t.back)}")
             any_new = True
+
+    from ..portfolio.service import create_portfolio
+    create_portfolio(issue)
 
     if not any_new:
         print(f"期号 {issue} 全部模型预测已存在（幂等命中），跳过通知")

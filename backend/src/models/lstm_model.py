@@ -29,6 +29,7 @@ from ..config import (
     FRONT_MAX,
     FRONT_MIN,
     LSTM_INCREMENTAL_REPLAY_MAX,
+    MONEY_FEATURE_VERSION,
 )
 from .base import BaseModel, Ticket
 
@@ -123,7 +124,8 @@ def _load_meta() -> dict:
     """
     if META_PATH.exists():
         try:
-            return json.loads(META_PATH.read_text(encoding="utf-8"))
+            meta = json.loads(META_PATH.read_text(encoding="utf-8"))
+            return meta if meta.get("money_feature_version") == MONEY_FEATURE_VERSION else {}
         except Exception:
             return {}
     return {}
@@ -134,7 +136,7 @@ def _save_meta(meta: dict) -> None:
     写入元数据
     """
     META_PATH.write_text(
-        json.dumps(meta, ensure_ascii=False, indent=2),
+        json.dumps({**meta, "money_feature_version": MONEY_FEATURE_VERSION}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
 

@@ -15,6 +15,8 @@
       </p>
     </section>
 
+    <PortfolioCard v-if="nextPrediction && !nextPrediction.real" :issue="nextPrediction.issue" :report="portfolio" :loaded="portfolioLoaded" />
+
     <section v-if="nextPrediction && !nextPrediction.real" class="card laya-current" aria-labelledby="home-laya-title">
       <div class="section-title">
         <h2 id="home-laya-title">第 {{ nextPrediction.issue }} 期 · Laya 独立选择</h2>
@@ -66,7 +68,7 @@
 
       <!-- 累计表现 -->
       <div class="card highlight-card" v-if="totalStats">
-        <div class="card-label">累计表现（全部模型）</div>
+        <div class="card-label">全库累计（含旧补算）</div>
         <div class="kpi-grid">
           <div>
             <div class="kpi-val">{{ totalStats.issues }}</div>
@@ -83,6 +85,7 @@
             <div class="kpi-label">累计 ROI</div>
           </div>
         </div>
+        <p class="laya-detail">奖金与 ROI 按规则估算，含未核验旧补算，不能视为实际收益。</p>
       </div>
     </section>
 
@@ -256,6 +259,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { api } from "../api";
 import BallRow from "../components/BallRow.vue";
 import NumberTrend from "../components/NumberTrend.vue";
+import PortfolioCard from "../components/PortfolioCard.vue";
 import { MODEL_LABELS } from "../api/models";
 
 const meta = ref(null);
@@ -264,6 +268,8 @@ const stats = ref({ summary: [], trend: {} });
 const predictions = ref([]);
 const laya = ref(null);
 const layaLoaded = ref(false);
+const portfolio = ref(null);
+const portfolioLoaded = ref(false);
 const verifiedModels = ref([]);
 const verifiedRandom = computed(() => verifiedModels.value.find((m) => m.model === "random"));
 const verifiedAligned = computed(() => verifiedModels.value.length > 0 && Boolean(verifiedModels.value[0].issue_set_sha256)
@@ -364,6 +370,7 @@ function formatFull(iso) {
 }
 
 onMounted(async () => {
+  api.portfolio().then((data) => { portfolio.value = data; portfolioLoaded.value = true; });
   api.laya().then((data) => { laya.value = data; layaLoaded.value = true; });
   api.significance().then((data) => { verifiedModels.value = data?.methodology?.scope === "verified_only" && Array.isArray(data.models) ? data.models : []; });
   const [m, h, s, p] = await Promise.all([

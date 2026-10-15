@@ -14,12 +14,12 @@ from ..config import (
     BACKTEST_MIN_START_INDEX,
     DATA_DIR,
     MODELS,
-    PRIZE_TABLE,
     TICKETS_PER_DRAW,
 )
 from ..db import get_conn, init_db
 from ..models import get_model
 from ..utils.numbers import count_hits, encode
+from ..utils.prizes import previous_pool, prize_for_hits
 from .dataio import load_history
 
 STATE_FILE = DATA_DIR / ".backtest_state.json"
@@ -89,6 +89,7 @@ def run_backtest(
             real_front = row.front
             real_back = row.back
             past = history.iloc[: start_idx + i]
+            pool_before = previous_pool(conn, real_issue)
 
             did_any_work = False
             for name in active_models:
@@ -121,7 +122,7 @@ def run_backtest(
                         (real_issue, name, idx, encode(t.front), encode(t.back)),
                     )
                     fh, bh = count_hits(t.front, t.back, real_front, real_back)
-                    level, amount = PRIZE_TABLE.get((fh, bh), (None, 0))
+                    level, amount = prize_for_hits(real_issue, fh, bh, pool_before)
                     conn.execute(
                         """
                         INSERT OR REPLACE INTO results

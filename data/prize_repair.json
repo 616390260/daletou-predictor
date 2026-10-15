@@ -1,0 +1,612 @@
+{
+  "timestamp": "2026-10-15T20:27:34.464872+00:00",
+  "source": "https://file.fjtc.com.cn/Attachment/2026-01/16/8f534265-b571-4e98-844d-061b31308be1.pdf",
+  "note": "奖金与ROI均为估算：26013期及以前沿用旧奖表估算；26014期起采用七奖级规则，8亿元档位以前一期开奖后奖池近似。浮动奖沿用估算值，追加投注、派奖及限额赔付未纳入。",
+  "validated_records": 963,
+  "updated_records": 67,
+  "changes": [
+    {
+      "issue": "26017",
+      "model": "genetic",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26019",
+      "model": "frequency",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26024",
+      "model": "genetic",
+      "ticket_idx": 0,
+      "old_level": "八等奖",
+      "old_amount": 15,
+      "new_level": "六等奖",
+      "new_amount": 15
+    },
+    {
+      "issue": "26030",
+      "model": "ensemble",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26032",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26036",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26039",
+      "model": "ensemble",
+      "ticket_idx": 0,
+      "old_level": "八等奖",
+      "old_amount": 15,
+      "new_level": "六等奖",
+      "new_amount": 15
+    },
+    {
+      "issue": "26040",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26040",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26041",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26042",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26046",
+      "model": "frequency",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26046",
+      "model": "genetic",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26048",
+      "model": "bayesian",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26050",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26054",
+      "model": "ensemble",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26054",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "八等奖",
+      "old_amount": 15,
+      "new_level": "六等奖",
+      "new_amount": 15
+    },
+    {
+      "issue": "26055",
+      "model": "frequency",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26059",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26059",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26062",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26062",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26063",
+      "model": "ensemble",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26063",
+      "model": "frequency",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26063",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26064",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "八等奖",
+      "old_amount": 15,
+      "new_level": "六等奖",
+      "new_amount": 15
+    },
+    {
+      "issue": "26065",
+      "model": "ensemble",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26069",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26071",
+      "model": "ensemble",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26074",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26078",
+      "model": "bayesian",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26079",
+      "model": "genetic",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26079",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "八等奖",
+      "old_amount": 15,
+      "new_level": "六等奖",
+      "new_amount": 18
+    },
+    {
+      "issue": "26083",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26083",
+      "model": "random",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26086",
+      "model": "frequency",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26086",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26087",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26088",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26089",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26091",
+      "model": "genetic",
+      "ticket_idx": 0,
+      "old_level": "八等奖",
+      "old_amount": 15,
+      "new_level": "六等奖",
+      "new_amount": 18
+    },
+    {
+      "issue": "26091",
+      "model": "random",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26092",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26094",
+      "model": "bayesian",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26094",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26095",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26096",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26097",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26098",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26099",
+      "model": "random",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26100",
+      "model": "bayesian",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26102",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26103",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26104",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26105",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26106",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26107",
+      "model": "random",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26107",
+      "model": "xgboost",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26109",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26112",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 7
+    },
+    {
+      "issue": "26113",
+      "model": "bayesian",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26113",
+      "model": "lstm",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26113",
+      "model": "transformer",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26114",
+      "model": "ensemble",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26114",
+      "model": "markov",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26114",
+      "model": "random",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    },
+    {
+      "issue": "26117",
+      "model": "frequency",
+      "ticket_idx": 0,
+      "old_level": "九等奖",
+      "old_amount": 5,
+      "new_level": "七等奖",
+      "new_amount": 5
+    }
+  ]
+}

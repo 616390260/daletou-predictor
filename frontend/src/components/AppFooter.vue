@@ -10,6 +10,7 @@
         <span>最新期号：{{ meta.latest_issue || "—" }}</span>
       </div>
       <div class="disclaimer">
+        奖金与 ROI 为规则估算，浮动奖、派奖及旧规则尚未全部按当期公告校准。<br />
         本站仅用于算法研究与彩票随机性验证，不构成任何投注建议。<br />
         理性购彩，适度娱乐。
       </div>

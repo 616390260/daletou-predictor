@@ -30,10 +30,14 @@ LSTM_INCREMENTAL_REPLAY_MAX = 2500
 # 序列模型 / XGBoost 使用的过去期数（与各模型 WINDOW 常量保持一致）
 SEQUENCE_FEATURE_WINDOW = 10
 
+# Invalidate weights trained with reversed source money columns.
+MONEY_FEATURE_VERSION = 2
+
 # Walk-forward 回测：历史表中「第一期被评估目标」的最小行索引（0-based）。
 # 评估第 i 行时 past = iloc[:i]，故 i 至少为 SEQUENCE_FEATURE_WINDOW+1，前若干行仅作上下文。
 BACKTEST_MIN_START_INDEX = SEQUENCE_FEATURE_WINDOW + 1
 
+# Legacy estimates retained for frozen Laya experiments and pre-26014 results.
 PRIZE_TABLE = {
     (5, 2): ("一等奖", 10_000_000),
     (5, 1): ("二等奖", 300_000),

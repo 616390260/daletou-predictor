@@ -41,3 +41,12 @@ CREATE TABLE IF NOT EXISTS results (
 
 CREATE INDEX IF NOT EXISTS idx_res_issue ON results(issue);
 CREATE INDEX IF NOT EXISTS idx_res_model ON results(model);
+
+-- Independent nine-ticket snapshots; settlement never replaces their payload.
+CREATE TABLE IF NOT EXISTS portfolio_runs (
+    issue TEXT NOT NULL,
+    version TEXT NOT NULL,
+    payload TEXT NOT NULL,
+    settlement TEXT,
+    PRIMARY KEY(issue, version)
+);

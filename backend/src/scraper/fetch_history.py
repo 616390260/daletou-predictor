@@ -78,8 +78,8 @@ def _parse_500_html(html: str) -> List[Dict]:
             issue = m.group(1)
             front = [int(m.group(i)) for i in range(2, 7)]
             back = [int(m.group(i)) for i in range(7, 9)]
-            sales = int(m.group(9).replace(",", ""))
-            pool = int(m.group(10).replace(",", ""))
+            pool = int(m.group(9).replace(",", ""))
+            sales = int(m.group(10).replace(",", ""))
             date = m.group(11)
             records.append(
                 {
@@ -196,8 +196,8 @@ def save_to_db(records: List[Dict]) -> int:
                     draw_date = excluded.draw_date,
                     front     = excluded.front,
                     back      = excluded.back,
-                    sales     = excluded.sales,
-                    pool      = excluded.pool
+                    sales     = CASE WHEN excluded.sales > 0 THEN excluded.sales ELSE draws.sales END,
+                    pool      = CASE WHEN excluded.pool > 0 THEN excluded.pool ELSE draws.pool END
                 """,
                 r,
             )

@@ -27,6 +27,7 @@ from ..config import (
     FRONT_COUNT,
     FRONT_MAX,
     FRONT_MIN,
+    MONEY_FEATURE_VERSION,
 )
 from ..utils.features import extract
 from .base import BaseModel, Ticket
@@ -187,7 +188,7 @@ class XGBoostModel(BaseModel):
         """
         针对同一历史快照只训练一次，避免 4 张投注都重算
         """
-        signature = f"{len(history)}-{history.iloc[-1]['issue']}"
+        signature = f"money-v{MONEY_FEATURE_VERSION}-{len(history)}-{history.iloc[-1]['issue']}"
         if CACHE_PATH.exists():
             try:
                 cache = np.load(CACHE_PATH)
