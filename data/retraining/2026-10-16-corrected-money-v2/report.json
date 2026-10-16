@@ -1,0 +1,152 @@
+{
+  "kind": "dated_retraining_audit",
+  "date": "2026-10-16",
+  "generated_at": "2026-10-16T03:49:04.704426+00:00",
+  "code_commit": "3847ac346f6eddcf72a284dd56fb4e7d14e58da1",
+  "money_feature_version": 2,
+  "training_data": {
+    "rows": 2935,
+    "first_issue": "07001",
+    "last_issue": "26117",
+    "data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd"
+  },
+  "validation": {
+    "train_cutoff": "26057",
+    "validation_first": "26058",
+    "validation_last": "26117",
+    "validation_periods": 60,
+    "weight_updates_during_validation": false,
+    "normalization": "production pre-target history only",
+    "analysis_type": "historical_holdout_not_prospective",
+    "metric_scope": "47 per-number marginal probabilities; not nine-ticket win frequency",
+    "baselines": {
+      "uniform": {
+        "log_loss": 0.4204426733295739,
+        "brier": 0.12664640324214796
+      },
+      "train_frequency": {
+        "log_loss": 0.4213334410070838,
+        "brier": 0.12686307520820095
+      }
+    },
+    "epochs_selected_using_holdout": false,
+    "old_checkpoint_comparison": "not performed: old weights already include holdout outcomes"
+  },
+  "models": {
+    "lstm": {
+      "validation": {
+        "log_loss": 0.4216825035938418,
+        "brier": 0.12698060669573985,
+        "training_loss": 0.4207362179460742,
+        "epochs": 20,
+        "better_than_uniform_log_loss": false,
+        "better_than_uniform_brier": false
+      },
+      "full_training": {
+        "last_trained_issue": "26117",
+        "last_loss": 0.4205741316640479,
+        "updates": 1,
+        "mode": "full",
+        "money_feature_version": 2,
+        "training_data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd",
+        "training_rows": 2935,
+        "supervised_examples": 2925,
+        "seed": 20261016,
+        "full_epochs": 20,
+        "retrained_at": "2026-10-16T03:46:26.268312+00:00",
+        "source": "corrected_sales_pool_full_retrain"
+      },
+      "duration_seconds": 14.87,
+      "checkpoint_sha256": "56e38690f30688e80021591805414f70c709669a99d2d87adc5ddf06ce03686c"
+    },
+    "transformer": {
+      "validation": {
+        "log_loss": 0.4315074163795025,
+        "brier": 0.12949879799368919,
+        "training_loss": 0.40929326142524136,
+        "epochs": 15,
+        "better_than_uniform_log_loss": false,
+        "better_than_uniform_brier": false
+      },
+      "full_training": {
+        "last_trained_issue": "26117",
+        "last_loss": 0.4096215723416744,
+        "updates": 1,
+        "money_feature_version": 2,
+        "training_data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd",
+        "training_rows": 2935,
+        "supervised_examples": 2925,
+        "seed": 20261016,
+        "full_epochs": 15,
+        "retrained_at": "2026-10-16T03:46:54.153959+00:00",
+        "source": "corrected_sales_pool_full_retrain"
+      },
+      "duration_seconds": 27.88,
+      "checkpoint_sha256": "9b509448fd918b51b75712b6263f18655706bf2d5bf1f0b60130abd2f2b503c4"
+    },
+    "xgboost": {
+      "validation": {
+        "log_loss": 0.4473022757515524,
+        "brier": 0.13274066476850216,
+        "classifiers": 47,
+        "better_than_uniform_log_loss": false,
+        "better_than_uniform_brier": false
+      },
+      "full_training": {
+        "last_trained_issue": "26117",
+        "training_rows": 2935,
+        "supervised_examples": 2925,
+        "backend": "native_xgboost",
+        "library_version": "3.2.0",
+        "classifiers": 47,
+        "max_depth": 4,
+        "n_estimators": 80,
+        "learning_rate": 0.1,
+        "nthread": 2,
+        "mode": "full",
+        "training_data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd"
+      },
+      "duration_seconds": 26.69
+    }
+  },
+  "predictions_replaced": false,
+  "laya_retrained": false,
+  "portfolio_replaced": false,
+  "conclusion": "三个模型均未在最近60期隔离验证上优于均匀概率基线。重训修正了金额数据口径，尚无准确率提高证据。",
+  "reproduction": {
+    "command": "Run the archived run_neural.py and run_xgboost.py from repository root with a scratch directory containing history.pkl and input.json, and an empty staged/ directory. Reconstruct history.pkl from the database only when its canonical training_data.data_sha256 matches this audit.",
+    "seed_neural": 20261016,
+    "xgboost_random_state": "library default (None); not changed",
+    "thread_limit": 2
+  },
+  "staged_artifacts": {
+    "xgboost_probs.npz": "f954ad6a8feec1f95d2eb73896a33a1e1887fd55f87a4e6d88231a77caca8c1c",
+    "lstm_state.pt": "56e38690f30688e80021591805414f70c709669a99d2d87adc5ddf06ce03686c",
+    "lstm_meta.json": "e4298b9ce018292249ad1cfbbaabd580d057f2513f99745926498858b256562c",
+    "transformer_state.pt": "9b509448fd918b51b75712b6263f18655706bf2d5bf1f0b60130abd2f2b503c4",
+    "transformer_meta.json": "6e9ce2555dd3fb6b2774abfad4fa0094dbe3e507e1f4bea7e7367ccce86a6a49"
+  },
+  "protected_before_sha256": {
+    "data/daletou.db": "933116661ba3a30dc546fc096783fa35ae16cae518360d68cd0eff21734fc116",
+    "data/export/laya.json": "efc3b0236cd44ca73684ca0af3a9f54a93addddd8ced86985b2106a78c01338d",
+    "data/export/portfolio.json": "001b716aa17a796610b7091dc351d975c6b5c7c0d18b247121abc45b879ed18a",
+    "data/laya/metadata.json": "1a1bd7f63b4a2467675eb6f7dbf57d259063c9b13bd5f89bd2a39f337db06a14"
+  },
+  "production_artifacts": {
+    "data/xgboost_probs.npz": "f954ad6a8feec1f95d2eb73896a33a1e1887fd55f87a4e6d88231a77caca8c1c",
+    "data/lstm_state.pt": "56e38690f30688e80021591805414f70c709669a99d2d87adc5ddf06ce03686c",
+    "data/lstm_meta.json": "e4298b9ce018292249ad1cfbbaabd580d057f2513f99745926498858b256562c",
+    "data/transformer_state.pt": "9b509448fd918b51b75712b6263f18655706bf2d5bf1f0b60130abd2f2b503c4",
+    "data/transformer_meta.json": "6e9ce2555dd3fb6b2774abfad4fa0094dbe3e507e1f4bea7e7367ccce86a6a49"
+  },
+  "environment": {
+    "python": "3.13.14",
+    "torch": "2.11.0",
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "xgboost": "3.2.0",
+    "scikit-learn": "1.8.0"
+  },
+  "promoted_for_future_experiment_predictions": true,
+  "promotion_note": "保存为现有实验模型的修正数据版本；不更改既有原票、历史核对、Laya或覆盖方案；不表示验证优于基线。"
+}

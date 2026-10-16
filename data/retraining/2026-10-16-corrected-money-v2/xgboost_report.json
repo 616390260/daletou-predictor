@@ -1,0 +1,22 @@
+{
+  "validation": {
+    "log_loss": 0.4473022757515524,
+    "brier": 0.13274066476850216,
+    "classifiers": 47
+  },
+  "full_training": {
+    "last_trained_issue": "26117",
+    "training_rows": 2935,
+    "supervised_examples": 2925,
+    "backend": "native_xgboost",
+    "library_version": "3.2.0",
+    "classifiers": 47,
+    "max_depth": 4,
+    "n_estimators": 80,
+    "learning_rate": 0.1,
+    "nthread": 2,
+    "mode": "full",
+    "training_data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd"
+  },
+  "duration_seconds": 26.69
+}

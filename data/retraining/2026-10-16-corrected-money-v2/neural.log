@@ -1,0 +1,80 @@
+[lstm] chronological validation: train through 26057, evaluate 60 later draws
+[LSTM·full] epoch 1/20  loss=0.4963
+[LSTM·full] epoch 2/20  loss=0.4210
+[LSTM·full] epoch 3/20  loss=0.4211
+[LSTM·full] epoch 4/20  loss=0.4211
+[LSTM·full] epoch 5/20  loss=0.4210
+[LSTM·full] epoch 6/20  loss=0.4211
+[LSTM·full] epoch 7/20  loss=0.4210
+[LSTM·full] epoch 8/20  loss=0.4208
+[LSTM·full] epoch 9/20  loss=0.4210
+[LSTM·full] epoch 10/20  loss=0.4207
+[LSTM·full] epoch 11/20  loss=0.4209
+[LSTM·full] epoch 12/20  loss=0.4209
+[LSTM·full] epoch 13/20  loss=0.4208
+[LSTM·full] epoch 14/20  loss=0.4209
+[LSTM·full] epoch 15/20  loss=0.4207
+[LSTM·full] epoch 16/20  loss=0.4208
+[LSTM·full] epoch 17/20  loss=0.4207
+[LSTM·full] epoch 18/20  loss=0.4207
+[LSTM·full] epoch 19/20  loss=0.4208
+[LSTM·full] epoch 20/20  loss=0.4207
+lstm validation {'log_loss': 0.4216825035938418, 'brier': 0.12698060669573985, 'training_loss': 0.4207362179460742, 'epochs': 20}
+[LSTM] 首次训练（全量）
+[LSTM·full] epoch 1/20  loss=0.4932
+[LSTM·full] epoch 2/20  loss=0.4211
+[LSTM·full] epoch 3/20  loss=0.4212
+[LSTM·full] epoch 4/20  loss=0.4208
+[LSTM·full] epoch 5/20  loss=0.4211
+[LSTM·full] epoch 6/20  loss=0.4209
+[LSTM·full] epoch 7/20  loss=0.4210
+[LSTM·full] epoch 8/20  loss=0.4209
+[LSTM·full] epoch 9/20  loss=0.4209
+[LSTM·full] epoch 10/20  loss=0.4209
+[LSTM·full] epoch 11/20  loss=0.4208
+[LSTM·full] epoch 12/20  loss=0.4209
+[LSTM·full] epoch 13/20  loss=0.4208
+[LSTM·full] epoch 14/20  loss=0.4208
+[LSTM·full] epoch 15/20  loss=0.4207
+[LSTM·full] epoch 16/20  loss=0.4209
+[LSTM·full] epoch 17/20  loss=0.4208
+[LSTM·full] epoch 18/20  loss=0.4206
+[LSTM·full] epoch 19/20  loss=0.4207
+[LSTM·full] epoch 20/20  loss=0.4206
+[lstm] staged full retrain complete
+[transformer] chronological validation: train through 26057, evaluate 60 later draws
+[Transformer·validation-train] epoch 1/15  loss=0.5046
+[Transformer·validation-train] epoch 2/15  loss=0.4210
+[Transformer·validation-train] epoch 3/15  loss=0.4208
+[Transformer·validation-train] epoch 4/15  loss=0.4209
+[Transformer·validation-train] epoch 5/15  loss=0.4207
+[Transformer·validation-train] epoch 6/15  loss=0.4207
+[Transformer·validation-train] epoch 7/15  loss=0.4206
+[Transformer·validation-train] epoch 8/15  loss=0.4204
+[Transformer·validation-train] epoch 9/15  loss=0.4202
+[Transformer·validation-train] epoch 10/15  loss=0.4196
+[Transformer·validation-train] epoch 11/15  loss=0.4186
+[Transformer·validation-train] epoch 12/15  loss=0.4169
+[Transformer·validation-train] epoch 13/15  loss=0.4153
+[Transformer·validation-train] epoch 14/15  loss=0.4129
+[Transformer·validation-train] epoch 15/15  loss=0.4093
+transformer validation {'log_loss': 0.4315074163795025, 'brier': 0.12949879799368919, 'training_loss': 0.40929326142524136, 'epochs': 15}
+[Transformer] 首次训练（全量）
+[Transformer·full] epoch 1/15  loss=0.5015
+[Transformer·full] epoch 2/15  loss=0.4210
+[Transformer·full] epoch 3/15  loss=0.4207
+[Transformer·full] epoch 4/15  loss=0.4207
+[Transformer·full] epoch 5/15  loss=0.4208
+[Transformer·full] epoch 6/15  loss=0.4208
+[Transformer·full] epoch 7/15  loss=0.4206
+[Transformer·full] epoch 8/15  loss=0.4205
+[Transformer·full] epoch 9/15  loss=0.4201
+[Transformer·full] epoch 10/15  loss=0.4193
+[Transformer·full] epoch 11/15  loss=0.4184
+[Transformer·full] epoch 12/15  loss=0.4170
+[Transformer·full] epoch 13/15  loss=0.4153
+[Transformer·full] epoch 14/15  loss=0.4128
+[Transformer·full] epoch 15/15  loss=0.4096
+[Transformer] 加载 checkpoint，上次训到 26117
+[Transformer] 已是最新训练 (26117)，跳过训练
+[transformer] staged full retrain complete

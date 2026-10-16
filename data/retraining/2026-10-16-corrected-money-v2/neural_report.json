@@ -1,0 +1,69 @@
+{
+  "split": {
+    "train_cutoff": "26057",
+    "validation_first": "26058",
+    "validation_last": "26117",
+    "validation_periods": 60,
+    "weight_updates_during_validation": false,
+    "normalization": "production pre-target history only"
+  },
+  "baselines": {
+    "uniform": {
+      "log_loss": 0.4204426733295739,
+      "brier": 0.12664640324214796
+    },
+    "train_frequency": {
+      "log_loss": 0.4213334410070838,
+      "brier": 0.12686307520820095
+    }
+  },
+  "models": {
+    "lstm": {
+      "validation": {
+        "log_loss": 0.4216825035938418,
+        "brier": 0.12698060669573985,
+        "training_loss": 0.4207362179460742,
+        "epochs": 20
+      },
+      "full_training": {
+        "last_trained_issue": "26117",
+        "last_loss": 0.4205741316640479,
+        "updates": 1,
+        "mode": "full",
+        "money_feature_version": 2,
+        "training_data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd",
+        "training_rows": 2935,
+        "supervised_examples": 2925,
+        "seed": 20261016,
+        "full_epochs": 20,
+        "retrained_at": "2026-10-16T03:46:26.268312+00:00",
+        "source": "corrected_sales_pool_full_retrain"
+      },
+      "duration_seconds": 14.87,
+      "checkpoint_sha256": "56e38690f30688e80021591805414f70c709669a99d2d87adc5ddf06ce03686c"
+    },
+    "transformer": {
+      "validation": {
+        "log_loss": 0.4315074163795025,
+        "brier": 0.12949879799368919,
+        "training_loss": 0.40929326142524136,
+        "epochs": 15
+      },
+      "full_training": {
+        "last_trained_issue": "26117",
+        "last_loss": 0.4096215723416744,
+        "updates": 1,
+        "money_feature_version": 2,
+        "training_data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd",
+        "training_rows": 2935,
+        "supervised_examples": 2925,
+        "seed": 20261016,
+        "full_epochs": 15,
+        "retrained_at": "2026-10-16T03:46:54.153959+00:00",
+        "source": "corrected_sales_pool_full_retrain"
+      },
+      "duration_seconds": 27.88,
+      "checkpoint_sha256": "9b509448fd918b51b75712b6263f18655706bf2d5bf1f0b60130abd2f2b503c4"
+    }
+  }
+}

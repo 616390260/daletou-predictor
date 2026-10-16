@@ -1,0 +1,5 @@
+XGBoost validated front: 35 native classifiers
+XGBoost validated back: 12 native classifiers
+XGBoost validation {'log_loss': 0.4473022757515524, 'brier': 0.13274066476850216, 'classifiers': 47}
+[XGBoost] 训练中，历史规模 2935...
+XGBoost staged full retrain complete
