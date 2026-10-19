@@ -21,6 +21,12 @@ on:
 permissions:
   contents: write
 
+# All branch-state writers share a queue; pending runs must not replace each other.
+concurrency:
+  group: daletou-state-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   predict:
     runs-on: ubuntu-latest
@@ -28,6 +34,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Resolve the latest branch head after entering the shared writer queue.
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@v5
         with:

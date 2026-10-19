@@ -36,8 +36,9 @@ permissions:
   actions: write # 需要此权限才能用 GITHUB_TOKEN 调 `gh workflow run` 自动接力
 
 concurrency:
-  group: backtest
+  group: daletou-state-${{ github.event.workflow_run.head_branch || github.ref_name }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   backtest:
@@ -46,6 +47,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Resolve the latest branch head after entering the shared writer queue.
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@v5
         with:
@@ -247,4 +251,4 @@ jobs:
             -f models="$MODELS" \
             -f auto_continue=true \
             -f time_budget_seconds="$TIME_BUDGET"
-          echo "[auto] 下一轮已提交（concurrency group=backtest 会等本轮完全结束后再跑）"
+          echo "[auto] 下一轮已提交（共享状态写入队列会等本轮完全结束后再跑）"

@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-10-19T11:22:44.622287+00:00",
+  "comparison_issue": "26118",
+  "comparison_kind": "retrospective_comparison",
+  "comparison_trained_through": "26117",
+  "frozen_model_commit": "9b15941",
+  "new_data_issue": "26118",
+  "new_data_date": "2026-10-17",
+  "prediction_issue": "26119",
+  "new_training_rows": 2936,
+  "new_models": {
+    "lstm": {
+      "meta": {
+        "last_trained_issue": "26118",
+        "last_loss": 0.42029945874681285,
+        "updates": 2,
+        "mode": "incremental",
+        "money_feature_version": 2
+      },
+      "sha256": "b84d75546f064f50357522c1e39df06e8c1ba811cbd82ff8588777088222c10b"
+    },
+    "transformer": {
+      "meta": {
+        "last_trained_issue": "26118",
+        "last_loss": 0.3973952829837799,
+        "updates": 2,
+        "money_feature_version": 2
+      },
+      "sha256": "9d6234ac7a436351c38b5ee7f090afb03832561006217c66e164149f2979abf0"
+    },
+    "xgboost": {
+      "signature": "money-v2-2936-26118",
+      "sha256": "d8d8d454ce5f1c13a8a649eb36111eb7775286ca98f68041df4f05d1975f76bc"
+    }
+  },
+  "original_predictions_unchanged": true
+}

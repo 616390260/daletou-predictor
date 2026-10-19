@@ -5,6 +5,8 @@
       <p>每期每个模型给出 1 注投注。绿圈 = 命中号码，未开奖期标记为"待开奖"。</p>
     </div>
 
+    <RetrainedComparison v-if="comparison" :report="comparison" />
+
     <section v-if="laya" class="card laya-overview" aria-labelledby="laya-title">
       <h2 id="laya-title">Laya 独立决策 · 实验中</h2>
       <dl class="laya-facts">
@@ -107,9 +109,12 @@
 import { computed, ref, onMounted } from "vue";
 import { api } from "../api";
 import BallRow from "../components/BallRow.vue";
+import RetrainedComparison from "../components/RetrainedComparison.vue";
+import { retrospectiveComparison } from "../utils/retrainedComparison";
 
 const items = ref([]);
 const laya = ref(null);
+const comparison = ref(null);
 const displayedItems = computed(() => {
   const decisions = new Map(
     (Array.isArray(laya.value?.decisions) ? laya.value.decisions : [])
@@ -160,6 +165,7 @@ onMounted(async () => {
   await Promise.all([
     api.predictions().then((data) => { items.value = data || []; }),
     api.laya().then((data) => { laya.value = data; }),
+    api.retrainedComparison().then((data) => { comparison.value = retrospectiveComparison(data); }),
   ]);
 });
 </script>

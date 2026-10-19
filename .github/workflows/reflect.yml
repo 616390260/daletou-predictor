@@ -23,8 +23,9 @@ permissions:
   actions: write # 自愈 step 需要 dispatch heartbeat.yml 等
 
 concurrency:
-  group: reflect
-  cancel-in-progress: true
+  group: daletou-state-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   reflect:
@@ -34,8 +35,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # 拉最新 main，因为 RUN_LOG 是上一个 workflow 刚 commit 的
-          ref: main
+          # Resolve the triggering branch head after entering the shared writer queue.
+          ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}
           fetch-depth: 1
 
       - uses: actions/setup-python@v5

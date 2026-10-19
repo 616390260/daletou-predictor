@@ -1329,6 +1329,65 @@
   },
   "decisions": [
     {
+      "issue": "26119",
+      "selected_model": "genetic",
+      "label": "遗传算法",
+      "front": [
+        1,
+        5,
+        7,
+        17,
+        20
+      ],
+      "back": [
+        5,
+        12
+      ],
+      "score": 0.2003,
+      "model_version": "daletou-decision-v1",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.1507
+        },
+        {
+          "model": "frequency",
+          "score": 0.0729
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0428
+        },
+        {
+          "model": "markov",
+          "score": 0.0698
+        },
+        {
+          "model": "xgboost",
+          "score": 0.1277
+        },
+        {
+          "model": "lstm",
+          "score": 0.0392
+        },
+        {
+          "model": "transformer",
+          "score": 0.0545
+        },
+        {
+          "model": "genetic",
+          "score": 0.2003
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0699
+        }
+      ],
+      "trained_through_issue": "26116",
+      "kind": "prospective",
+      "result": null
+    },
+    {
       "issue": "26117",
       "selected_model": "xgboost",
       "label": "XGBoost",
@@ -2048,7 +2107,7 @@
       "trained_through_issue": "26098"
     }
   ],
-  "generated_at": "2026-10-14T15:22:07+00:00",
+  "generated_at": "2026-10-19T11:22:14+00:00",
   "active_model": {
     "version": "daletou-decision-v1",
     "model_path": "~/laya-lab/models/daletou-decision-v1",

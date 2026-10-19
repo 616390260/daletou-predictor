@@ -1,0 +1,14 @@
+{
+  "last_trained_issue": "26117",
+  "last_loss": 0.4205741316640479,
+  "updates": 1,
+  "mode": "full",
+  "money_feature_version": 2,
+  "training_data_sha256": "d41904a8bff21e117a38b67cc8fc1691d601446c90a070de6be9e49b195624bd",
+  "training_rows": 2935,
+  "supervised_examples": 2925,
+  "seed": 20261016,
+  "full_epochs": 20,
+  "retrained_at": "2026-10-16T03:46:26.268312+00:00",
+  "source": "corrected_sales_pool_full_retrain"
+}

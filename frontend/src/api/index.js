@@ -21,6 +21,7 @@ export const api = {
   history: () => fetchJson("history.json", []),
   frequency: () => fetchJson("frequency.json", null),
   predictions: () => fetchJson("predictions.json", []),
+  retrainedComparison: () => fetchJson("retrained_comparison.json", null),
   laya: () => fetchJson("laya.json", null),
   portfolio: () => fetchJson("portfolio.json", null),
   stats: () => fetchJson("stats.json", { summary: [], trend: {} }),

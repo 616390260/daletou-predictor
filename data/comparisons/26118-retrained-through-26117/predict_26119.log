@@ -1,0 +1,39 @@
+为期号 26119 生成预测（已存在: 无）
+  random: 生成中...
+    注1: 前 14,21,30,33,35  后 10,12
+  frequency: 生成中...
+    注1: 前 14,21,24,32,35  后 04,08
+  bayesian: 生成中...
+    注1: 前 02,08,11,13,20  后 01,07
+  markov: 生成中...
+    注1: 前 05,07,18,22,32  后 09,10
+  xgboost: 生成中...
+    注1: 前 02,10,19,20,23  后 06,11
+  lstm: 生成中...
+[LSTM] 加载 checkpoint，上次训练到 26117
+[LSTM·incr] epoch 1/8  loss=0.4206
+[LSTM·incr] epoch 2/8  loss=0.4204
+[LSTM·incr] epoch 3/8  loss=0.4204
+[LSTM·incr] epoch 4/8  loss=0.4204
+[LSTM·incr] epoch 5/8  loss=0.4204
+[LSTM·incr] epoch 6/8  loss=0.4203
+[LSTM·incr] epoch 7/8  loss=0.4204
+[LSTM·incr] epoch 8/8  loss=0.4203
+[LSTM] checkpoint 已更新（累计更新 2 次）
+    注1: 前 04,13,18,24,29  后 06,12
+  transformer: 生成中...
+[Transformer] 加载 checkpoint，上次训到 26117
+[Transformer] 增量微调：新增 1 期 + 回放 60 期
+[Transformer·incr] epoch 1/6  loss=0.4081
+[Transformer·incr] epoch 2/6  loss=0.4059
+[Transformer·incr] epoch 3/6  loss=0.4033
+[Transformer·incr] epoch 4/6  loss=0.4010
+[Transformer·incr] epoch 5/6  loss=0.3989
+[Transformer·incr] epoch 6/6  loss=0.3974
+    注1: 前 01,02,13,15,21  后 02,10
+  genetic: 生成中...
+    注1: 前 01,05,07,17,20  后 05,12
+  ensemble: 生成中...
+    注1: 前 02,05,21,24,35  后 04,08
+issue=26119
+predict_any_new=true

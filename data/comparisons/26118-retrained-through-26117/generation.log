@@ -1,0 +1,14 @@
+random 13,14,20,27,33 01,08
+frequency 02,03,12,16,28 03,04
+bayesian 02,08,11,13,20 01,07
+markov 08,16,23,24,34 02,03
+xgboost 02,06,11,17,21 07,09
+[LSTM] 加载 checkpoint，上次训练到 26117
+[LSTM] 已是最新，无需重训
+lstm 04,12,17,24,29 06,12
+[Transformer] 加载 checkpoint，上次训到 26117
+[Transformer] 已是最新训练 (26117)，跳过训练
+transformer 01,02,12,14,21 03,10
+genetic 05,07,29,32,35 04,10
+ensemble 02,08,11,13,14 02,09
+{'original': {'tickets': 9, 'cost': 18, 'winning_tickets': 0, 'estimated_prize': 0}, 'retrained': {'tickets': 9, 'cost': 18, 'winning_tickets': 1, 'estimated_prize': 5}}
