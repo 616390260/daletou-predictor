@@ -188,6 +188,42 @@ class DataRulesTests(unittest.TestCase):
                 fetch_history.save_to_db(records)
             self.assertEqual(tuple(conn.execute('SELECT sales, pool FROM draws').fetchone()), (123, 456))
 
+    def test_incremental_fetch_revisits_latest_incomplete_money(self):
+        from backend.src.scraper import fetch_history
+        for sales, pool in [(0, 0), (123, 0), (0, 456), (None, None)]:
+            with self.subTest(sales=sales, pool=pool), _draw_db() as conn:
+                conn.execute('UPDATE draws SET sales=?, pool=?', (sales, pool))
+                conn.commit()
+                original = tuple(conn.execute('SELECT issue, draw_date, front, back FROM draws').fetchone())
+                @contextmanager
+                def get_conn():
+                    yield conn
+                records = _parse_500_html(_html())
+                def source(start):
+                    return [r for r in records if r['issue'] >= start]
+                with patch.object(fetch_history, 'get_conn', get_conn), patch.object(fetch_history, 'init_db'), \
+                        patch.object(fetch_history, 'fetch_all', side_effect=source):
+                    fetch_history.run()
+                self.assertEqual(tuple(conn.execute('SELECT sales, pool FROM draws').fetchone()),
+                                 (300_000_002, 900_000_001))
+                self.assertEqual(tuple(conn.execute('SELECT issue, draw_date, front, back FROM draws').fetchone()), original)
+
+    def test_incremental_fetch_keeps_complete_latest_and_inserts_next_draw(self):
+        from backend.src.scraper import fetch_history
+        with _draw_db() as conn:
+            conn.execute('UPDATE draws SET sales=123, pool=456')
+            conn.commit()
+            next_draw = {**_parse_500_html(_html())[0], 'issue': '26015', 'draw_date': '2026-02-04'}
+            @contextmanager
+            def get_conn():
+                yield conn
+            with patch.object(fetch_history, 'get_conn', get_conn), patch.object(fetch_history, 'init_db'), \
+                    patch.object(fetch_history, 'fetch_all', return_value=[next_draw]) as source:
+                fetch_history.run()
+            source.assert_called_once_with(start='26015')
+            self.assertEqual(tuple(conn.execute("SELECT sales, pool FROM draws WHERE issue='26014'").fetchone()), (123, 456))
+            self.assertEqual(conn.execute('SELECT COUNT(*) FROM draws').fetchone()[0], 2)
+
     def test_old_money_feature_meta_is_rejected(self):
         for module_name in ['lstm_model', 'transformer_model']:
             with self.subTest(module=module_name), tempfile.TemporaryDirectory() as tmp:

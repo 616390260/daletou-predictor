@@ -148,7 +148,7 @@ def fetch_all(start: str = "07001") -> List[Dict]:
     """
     抓取开奖数据。先尝试 500 彩票网（快、全），网络失败才降级到官方 API
 
-    @param start 起始期号（增量抓取时只需给数据库最新期号 +1）
+    @param start First issue to fetch, including an incomplete latest draw if needed.
     """
     try:
         print(f"从 500 彩票网抓取（start={start}）…")
@@ -208,16 +208,21 @@ def save_to_db(records: List[Dict]) -> int:
 
 def run(full: bool = False) -> None:
     """
-    抓取入口：默认增量（只抓数据库最新期号之后的新数据），可指定 full=True 全量重抓
+    Fetch new draws and retry the latest draw when its financial data is incomplete.
 
-    @param full 是否强制全量抓取
+    @param full Whether to fetch the full history.
     """
     latest = None if full else _latest_issue_in_db()
     if latest:
-        try:
-            start = f"{int(latest) + 1:05d}"
-        except ValueError:
+        with get_conn() as conn:
+            money = conn.execute("SELECT sales, pool FROM draws WHERE issue = ?", (latest,)).fetchone()
+        if money is not None and ((money['sales'] or 0) <= 0 or (money['pool'] or 0) <= 0):
             start = latest
+        else:
+            try:
+                start = f"{int(latest) + 1:05d}"
+            except ValueError:
+                start = latest
         print(f"数据库最新期号 {latest}，增量抓取从 {start} 开始")
         records = fetch_all(start=start)
         if not records:

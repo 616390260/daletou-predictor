@@ -1329,6 +1329,66 @@
   },
   "decisions": [
     {
+      "issue": "26120",
+      "selected_model": "genetic",
+      "label": "遗传算法",
+      "front": [
+        10,
+        31,
+        33,
+        34,
+        35
+      ],
+      "back": [
+        7,
+        12
+      ],
+      "score": 0.1929,
+      "model_version": "daletou-decision-v1",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0694
+        },
+        {
+          "model": "frequency",
+          "score": 0.0757
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0447
+        },
+        {
+          "model": "markov",
+          "score": 0.0659
+        },
+        {
+          "model": "xgboost",
+          "score": 0.1479
+        },
+        {
+          "model": "lstm",
+          "score": 0.0305
+        },
+        {
+          "model": "transformer",
+          "score": 0.0561
+        },
+        {
+          "model": "genetic",
+          "score": 0.1929
+        },
+        {
+          "model": "ensemble",
+          "score": 0.086
+        }
+      ],
+      "trained_through_issue": "26116",
+      "kind": "prospective",
+      "result": null,
+      "decided_at": "2026-10-19T14:24:33+00:00"
+    },
+    {
       "issue": "26119",
       "selected_model": "genetic",
       "label": "遗传算法",
@@ -1385,7 +1445,27 @@
       ],
       "trained_through_issue": "26116",
       "kind": "prospective",
-      "result": null
+      "result": {
+        "front_hit": 1,
+        "back_hit": 0,
+        "level": null,
+        "amount": 0
+      },
+      "real": {
+        "front": [
+          3,
+          6,
+          20,
+          24,
+          32
+        ],
+        "back": [
+          4,
+          7
+        ],
+        "date": "2026-10-19"
+      },
+      "evaluated_at": "2026-10-19T14:23:44+00:00"
     },
     {
       "issue": "26117",
@@ -2107,7 +2187,7 @@
       "trained_through_issue": "26098"
     }
   ],
-  "generated_at": "2026-10-19T11:22:14+00:00",
+  "generated_at": "2026-10-19T14:23:44+00:00",
   "active_model": {
     "version": "daletou-decision-v1",
     "model_path": "~/laya-lab/models/daletou-decision-v1",
