@@ -47,7 +47,7 @@ data/
 2. workflow 后续的 `Export JSON / Render charts / Commit progress / Notify / Auto-dispatch` **全部 `if: always()`**，哪怕 backtest 异常也会保存已算的部分
 3. `Commit progress` 用 `stefanzweifel/git-auto-commit-action@v5` 把 DB + JSON + 图表 + state 推回 main
 4. `Auto-dispatch next run` 读 state，若 `done=false` 就用 `GITHUB_TOKEN` + `gh workflow run` 触发自己
-5. `concurrency: group=backtest, cancel-in-progress: false` 保证新 run 排队等旧 run 完全结束才启动
+5. predict/evaluate/backtest/reflect 使用同分支共享 `daletou-state-*` 队列（`cancel-in-progress: false, queue: max`），保存最多100个待运行任务。取得队列后 checkout 分支最新头，防止排队前事件SHA导致过期推送。
 6. 下一轮 `actions/checkout@v4` 拉到包含最新 DB 的 main，靠 `backtest.py` 第 61 行的 `SELECT ... LIMIT 1` 命中即跳过，自然从断点续跑
 
 **你改 backtest.yml 的注意事项：**
@@ -157,7 +157,7 @@ with open(os.path.expanduser("~/.git-credentials")) as f:
 
 1. **predict 不抢 20:00 停售前的时间**。开奖 21:15 后，距下一次开奖约 46h，从容不迫。
 2. **不依赖 GitHub schedule**。靠 backtest 自续 dispatch（concurrency 排队+fail-safe 接力）持续产生心跳。
-3. **predict 不等 backtest 完成**。evaluate 触发 predict 和 backtest 是**并行**的——LSTM/Transformer 自己有增量训练，拿到最新 DB 就能预测。backtest 是评估工具，不是预测依赖。
+3. **predict 无训练数据上的 backtest 依赖，但写仓库必须串行**。evaluate 可以提交 predict 与 backtest 两个任务，两者和reflect进入同分支共享队列。2026-10-19确认过并行写main导致预测已算出但push被拒绝、全部产物丢失；因此即使训练逻辑独立，也必须先保证状态持久化。长backtest会延迟队列中的预测，时间预算需为下一次停售保留余量。
 4. **每个环节都幂等**：evaluate 只处理无 results 的期，predict 只生成新期缺失的模型，backtest 只跑未跑过的 (issue, model)。心跳重复 dispatch 不会重复骚扰。
 
 **事件链的必要条件**：
