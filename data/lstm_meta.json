@@ -1,7 +1,7 @@
 {
-  "last_trained_issue": "26121",
-  "last_loss": 0.4188540044640217,
-  "updates": 5,
+  "last_trained_issue": "26122",
+  "last_loss": 0.41769781784980786,
+  "updates": 6,
   "mode": "incremental",
   "money_feature_version": 2
 }
