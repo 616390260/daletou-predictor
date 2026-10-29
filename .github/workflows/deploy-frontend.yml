@@ -13,7 +13,7 @@ on:
   # 的 `paths: data/export/**` 也命不中。解法：订阅 workflow_run 事件，这是
   # GitHub 明确允许的跨 workflow 触发方式，不受 GITHUB_TOKEN 限制。
   workflow_run:
-    workflows: ["Predict Next Draw", "Evaluate Draw Result", "Walk-Forward Backtest"]
+    workflows: ["Predict Next Draw", "Evaluate Draw Result", "Walk-Forward Backtest", "Laya Independent Decision"]
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -30,8 +30,12 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    # workflow_run 触发时若 upstream 未成功则不部署（失败的 run 可能带坏数据）
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Laya may commit valid settlement before optional model inference fails.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success' ||
+      (github.event.workflow_run.name == 'Laya Independent Decision' &&
+       github.event.workflow_run.conclusion == 'failure')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

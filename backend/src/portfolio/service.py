@@ -3,27 +3,18 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from ..analytics.significance import _collect_per_model_hits
 from ..config import EXPORT_DIR, MODELS, TICKET_PRICE
 from ..db import get_conn
+from ..utils.draw_calendar import next_draw_deadline as _deadline
 from ..utils.numbers import decode
 from .coverage import VERSION, optimize
 
 
 def _now():
     return datetime.now(timezone.utc)
-
-
-def _deadline(latest_date):
-    # A stale draw feed must not label an after-draw snapshot as prospective.
-    date = datetime.fromisoformat(latest_date).replace(hour=20, tzinfo=timezone(timedelta(hours=8)))
-    for offset in range(1, 8):
-        target = date + timedelta(days=offset)
-        if target.weekday() in (0, 2, 5):
-            return target
-    raise ValueError('Invalid draw calendar')
 
 
 def verified_issues():

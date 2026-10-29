@@ -1,2 +1,7 @@
-# Optional local decision runtime; GitHub Actions keeps the core requirements.
+# Install torch from the CPU wheel index before installing this file in CI.
 laya==0.3.21
+torch==2.14.0
+transformers==5.17.0
+safetensors==0.8.0
+huggingface_hub==1.33.0
+numpy==2.4.6

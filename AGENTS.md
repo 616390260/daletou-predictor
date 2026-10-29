@@ -47,7 +47,7 @@ data/
 2. workflow 后续的 `Export JSON / Render charts / Commit progress / Notify / Auto-dispatch` **全部 `if: always()`**，哪怕 backtest 异常也会保存已算的部分
 3. `Commit progress` 用 `stefanzweifel/git-auto-commit-action@v5` 把 DB + JSON + 图表 + state 推回 main
 4. `Auto-dispatch next run` 读 state，若 `done=false` 就用 `GITHUB_TOKEN` + `gh workflow run` 触发自己
-5. predict/evaluate/backtest/reflect 使用同分支共享 `daletou-state-*` 队列（`cancel-in-progress: false, queue: max`），保存最多100个待运行任务。取得队列后 checkout 分支最新头，防止排队前事件SHA导致过期推送。
+5. predict/evaluate/backtest/reflect/laya 使用同分支共享 `daletou-state-*` 队列（`cancel-in-progress: false, queue: max`），保存最多100个待运行任务。取得队列后 checkout 分支最新头，防止排队前事件SHA导致过期推送。
 6. 下一轮 `actions/checkout@v4` 拉到包含最新 DB 的 main，靠 `backtest.py` 第 61 行的 `SELECT ... LIMIT 1` 命中即跳过，自然从断点续跑
 
 **你改 backtest.yml 的注意事项：**
@@ -175,6 +175,14 @@ with open(os.path.expanduser("~/.git-credentials")) as f:
 gh run list --limit 50 --json name,event,createdAt,status,conclusion
 # 找事件链是否完整：evaluate 成功 → 应紧跟一个 workflow_dispatch 触发的 predict
 ```
+
+### Laya 独立决策自动链路
+
+- predict 持久化九模型与 JSON 后 dispatch `laya.yml`；evaluate 核对到新开奖后也 dispatch Laya。predict 需要 `actions: write`，触发失败必须保留为失败，不静默吞掉。
+- `laya.yml` 与其他 writer 共用队列；先无模型核对已保存选择，再检查下一期候选。只有需要新选择时才安装 CPU runtime、恢复固定基座并推理。提交 `data/export/laya.json` 和 RUN_LOG 后，部署 workflow 更新 Pages。
+- 仍使用独立冻结 v1，不加入 `MODELS`，不自动重训或改写冻结评估。Linux 使用 `LAYA_DEVICE=cpu`，本地默认 MPS；所需依赖在 `backend/requirements-laya.txt`，基座 pinned revision 与摘要由 `laya.bootstrap` 校验。
+- 已发布选择不可重算；已开奖或过停售的缺失期不能当成前瞻选择补录。自动化只追加真实结果、创建尚未截止的下一期。完整使用说明见 [docs/LAYA_AUTOMATION.md](docs/LAYA_AUTOMATION.md)。
+- 恢复：`gh workflow run laya.yml --ref main`。重复运行不会重新评分已有选择，冻结模型版本和原九模型号码保持不变。
 
 ## AI 反思 Protocol（每次进入本 repo 必读）
 

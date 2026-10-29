@@ -45,10 +45,13 @@ def choose_candidate(candidates: list[dict]) -> dict:
 
 
 class LayaScorer:
-    """Lazy MPS inference restricted to local daletou model directories."""
+    """Lazy device-selected inference restricted to local daletou model directories."""
 
     def __init__(self, model_path: Path, trained_through_issue: str):
         _issue(trained_through_issue)
+        self.device = os.environ.get("LAYA_DEVICE", "mps")
+        if self.device not in {"cpu", "mps", "cuda"}:
+            raise ValueError("LAYA_DEVICE must be cpu, mps, or cuda")
         root = (Path.home() / "laya-lab" / "models").resolve()
         self.model_path = Path(model_path).expanduser().resolve()
         try:
@@ -87,14 +90,14 @@ class LayaScorer:
             os.environ["USE_TF"] = "0"
             import laya
             if self.base_path is None:
-                self._agent = laya.Agent(str(self.model_path), device="mps")
+                self._agent = laya.Agent(str(self.model_path), device=self.device)
             else:
                 from safetensors.torch import load_file
                 from laya.common import clamp_temperature
                 digest = hashlib.sha256((self.base_path / "model.safetensors").read_bytes()).hexdigest()
                 if digest != self.config.get("base_checkpoint_sha256"):
                     raise ValueError("Laya base checkpoint digest mismatch")
-                agent = laya.Agent(str(self.base_path), device="mps")
+                agent = laya.Agent(str(self.base_path), device=self.device)
                 head = load_file(str(self.model_path / "model.safetensors"))
                 expected = {key for key in agent.model.state_dict() if not key.startswith("encoder.")}
                 if set(head) != expected:

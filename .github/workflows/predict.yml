@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 # All branch-state writers share a queue; pending runs must not replace each other.
 concurrency:
@@ -143,3 +144,9 @@ jobs:
         with:
           commit_message: "chore(data): export json for frontend"
           file_pattern: data/**/*.json
+
+      - name: Dispatch independent Laya decision
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF_NAME: ${{ github.ref_name }}
+        run: gh workflow run laya.yml --ref "$REF_NAME"

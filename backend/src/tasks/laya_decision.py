@@ -5,55 +5,20 @@ import argparse
 import json
 from pathlib import Path
 
-from ..config import DATA_DIR, EXPORT_DIR, MODEL_LABELS, MODELS, PRIZE_TABLE
+from ..config import DATA_DIR, EXPORT_DIR
 from ..db import get_conn
-from ..laya.dataset import build_dataset, build_state
-from ..laya.experiment import evaluate_version, local_model_lock, resolve_checkpoint, train_version, write_report
-from ..laya.runtime import LayaScorer, choose_candidate
-from ..utils.numbers import count_hits, decode
+from ..laya.dataset import build_dataset
+from ..laya.experiment import evaluate_version, train_version, write_report
+from ..laya.lifecycle import create_decision
 
 DATASET = DATA_DIR / "laya"
 REPORT = EXPORT_DIR / "laya.json"
 
 
 def decide(issue: str, manifest: dict) -> dict:
-    """Select one already existing ticket, without generating original model predictions."""
-    meta = json.loads((DATASET / "metadata.json").read_text())
+    """Freeze a next-issue choice, preserving any already published decision."""
     with get_conn() as conn:
-        candidates = conn.execute(
-            "SELECT model,front,back FROM predictions WHERE issue=? AND ticket_idx=0", (issue,),
-        ).fetchall()
-        if {r["model"] for r in candidates} != set(MODELS) or len(candidates) != len(MODELS):
-            raise ValueError(f"Issue {issue} requires all 9 original candidates first")
-        states = []
-        for row in candidates:
-            front, back = decode(row["front"]), decode(row["back"])
-            state = build_state(conn, issue, row["model"], front, back, meta["verified_start_issue"])
-            states.append({"model": row["model"], "front": front, "back": back, "state": state})
-        draw = conn.execute("SELECT front,back FROM draws WHERE issue=?", (issue,)).fetchone()
-    with local_model_lock():
-        scorer = LayaScorer(resolve_checkpoint(DATASET, manifest), manifest["trained_through_issue"])
-        ranked = [{**row, "score": scorer.score(row["state"], issue)} for row in states]
-    chosen = choose_candidate(ranked)
-    result = None
-    if draw:
-        fh, bh = count_hits(chosen["front"], chosen["back"], decode(draw["front"]), decode(draw["back"]))
-        level, amount = PRIZE_TABLE.get((fh, bh), (None, 0))
-        result = {"front_hit": fh, "back_hit": bh, "level": level, "amount": amount}
-    decision = {
-        "issue": issue, "selected_model": chosen["model"],
-        "label": MODEL_LABELS[chosen["model"]], "front": chosen["front"], "back": chosen["back"],
-        "score": round(chosen["score"], 6), "model_version": manifest["version"],
-        "candidate_scores": [{"model": row["model"], "score": round(row["score"], 6)} for row in ranked],
-        "trained_through_issue": manifest["trained_through_issue"],
-        "kind": "retrospective" if draw else "prospective", "result": result,
-    }
-    report = json.loads(REPORT.read_text()) if REPORT.exists() else {}
-    decisions = [d for d in report.get("decisions", []) if d["issue"] != issue]
-    decisions.append(decision)
-    decisions.sort(key=lambda d: d["issue"], reverse=True)
-    write_report(REPORT, {"decisions": decisions})
-    return decision
+        return create_decision(conn, issue, manifest, DATASET, REPORT)
 
 
 def main() -> None:

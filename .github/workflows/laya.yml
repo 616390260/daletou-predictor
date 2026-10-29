@@ -1,0 +1,86 @@
+name: Laya Independent Decision
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daletou-state-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      LAYA_DEVICE: cpu
+      USE_TF: "0"
+      OMP_NUM_THREADS: "2"
+      TOKENIZERS_PARALLELISM: "false"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Resolve state after entering the same writer queue as the original models.
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements-laya.txt
+
+      - name: Settle published decisions
+        run: python -m backend.src.tasks.laya_sync --settle-only
+
+      - name: Inspect next decision
+        id: plan
+        run: python -m backend.src.tasks.laya_sync --check
+
+      - name: Cache multilingual base
+        if: steps.plan.outputs.needs_decision == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/laya-lab/hf
+          key: laya-base-${{ runner.os }}-e4e9ddf21a7b1903b7acffd8814ad4307bf63a67
+
+      - name: Install CPU runtime
+        if: steps.plan.outputs.needs_decision == 'true'
+        run: |
+          python -m pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r backend/requirements-laya.txt
+
+      - name: Prepare pinned multilingual base
+        if: steps.plan.outputs.needs_decision == 'true'
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: python -m backend.src.laya.bootstrap --version "$VERSION"
+
+      - name: Select next issue
+        if: steps.plan.outputs.needs_decision == 'true'
+        env:
+          HF_HUB_OFFLINE: "1"
+          TRANSFORMERS_OFFLINE: "1"
+        run: python -m backend.src.tasks.laya_sync
+
+      - name: Append RUN_LOG.jsonl
+        if: always()
+        env:
+          LAYA_OUTCOME: ${{ job.status }}
+          LAYA_ISSUE: ${{ steps.plan.outputs.issue }}
+          NEEDS_DECISION: ${{ steps.plan.outputs.needs_decision }}
+        run: |
+          EXTRA=$(python -c "import json,os; print(json.dumps({'issue':os.environ.get('LAYA_ISSUE') or None,'needs_decision':os.environ.get('NEEDS_DECISION') == 'true'}))")
+          python -m backend.src.utils.run_log --workflow laya --outcome "$LAYA_OUTCOME" --extra-json "$EXTRA"
+
+      - name: Commit Laya decisions and run log
+        if: always()
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(laya): synchronize independent decisions"
+          file_pattern: >-
+            data/export/laya.json
+            docs/RUN_LOG*.jsonl

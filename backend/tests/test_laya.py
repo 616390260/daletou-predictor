@@ -208,6 +208,10 @@ class LayaDecisionTests(unittest.TestCase):
 
 class LayaRuntimeTests(unittest.TestCase):
     def setUp(self):
+        import os
+        self.env_patch = patch.dict(os.environ)
+        self.env_patch.start()
+        os.environ.pop("LAYA_DEVICE", None)
         self.temp = tempfile.TemporaryDirectory()
         self.home = Path(self.temp.name)
         self.model = self.home / "laya-lab/models/daletou-test"
@@ -218,6 +222,7 @@ class LayaRuntimeTests(unittest.TestCase):
         self.home_patch.start()
 
     def tearDown(self):
+        self.env_patch.stop()
         self.home_patch.stop()
         self.temp.cleanup()
 
@@ -276,6 +281,37 @@ class LayaRuntimeTests(unittest.TestCase):
             with self.subTest(probabilities=probabilities), self.assertRaises(ValueError):
                 scorer.score("{}", "26099")
 
+    def test_explicit_cpu_device_is_used_for_lazy_inference(self):
+        import os
+        import types
+        calls = []
+
+        class Agent:
+            def __init__(self, path, device):
+                calls.append(device)
+
+            def predict(self, state, questions):
+                return {"answers": {"s": {"probabilities": {"A": 0.25, "B": 0.75}}}}
+
+        with patch.dict(os.environ, {"LAYA_DEVICE": "cpu"}), \
+                patch.dict("sys.modules", {"laya": types.SimpleNamespace(Agent=Agent)}):
+            scorer = LayaScorer(self.model, "26098")
+            self.assertEqual(scorer.score("{}", "26099"), 0.25)
+        self.assertEqual(calls, ["cpu"])
+
+    def test_invalid_device_is_rejected_before_import(self):
+        import os
+        for device in ("", "gpu", "cuda:0", "CPU", "cpu;echo invalid"):
+            with self.subTest(device=device), patch.dict(os.environ, {"LAYA_DEVICE": device}):
+                with self.assertRaisesRegex(ValueError, "LAYA_DEVICE"):
+                    LayaScorer(self.model, "26098")
+
+    def test_supported_device_selection(self):
+        import os
+        for device in ("cpu", "mps", "cuda"):
+            with self.subTest(device=device), patch.dict(os.environ, {"LAYA_DEVICE": device}):
+                self.assertEqual(LayaScorer(self.model, "26098").device, device)
+
     def test_adapter_cannot_load_seo_or_external_base(self):
         self.config.write_text(json.dumps({"task": TASK, "adapter_type": "head-only",
                                           "base_model_path": str(self.home / "seo")}))
@@ -289,6 +325,7 @@ class LayaRuntimeTests(unittest.TestCase):
 
     def test_head_adapter_restores_only_head_and_calibration(self):
         import hashlib
+        import os
         import types
         base = self.home / "laya-lab/hf/hub/models--convaiinnovations--laya-multilingual/snapshots/base"
         base.mkdir(parents=True)
@@ -299,6 +336,7 @@ class LayaRuntimeTests(unittest.TestCase):
             "temperature": [1.0, 2.0, 1.0], "trained_through_issue": "26098",
         }))
         calls = []
+        devices = []
 
         class Model:
             def state_dict(self):
@@ -312,6 +350,7 @@ class LayaRuntimeTests(unittest.TestCase):
 
         class Agent:
             def __init__(self, path, device):
+                devices.append(device)
                 self.model = Model()
 
             def predict(self, state, questions):
@@ -320,12 +359,13 @@ class LayaRuntimeTests(unittest.TestCase):
         modules = {"laya": types.SimpleNamespace(Agent=Agent),
                    "laya.common": types.SimpleNamespace(clamp_temperature=lambda x: x),
                    "safetensors.torch": types.SimpleNamespace(load_file=lambda path: {"head.weight": 5})}
-        with patch.dict("sys.modules", modules):
+        with patch.dict("sys.modules", modules), patch.dict(os.environ, {"LAYA_DEVICE": "cpu"}):
             scorer = LayaScorer(self.model, "26098")
             self.assertEqual(scorer.score("{}", "26099"), 0.3)
             self.assertEqual(calls, [({"head.weight": 5}, False)])
             self.assertEqual(scorer._agent.temperature, [1.0, 2.0, 1.0])
             self.assertEqual(scorer._agent.temperature_by_options, {})
+            self.assertEqual(devices, ["cpu"])
             modules["safetensors.torch"].load_file = lambda path: {"encoder.weight": 5}
             with self.assertRaisesRegex(ValueError, "exactly"):
                 LayaScorer(self.model, "26098").score("{}", "26099")
