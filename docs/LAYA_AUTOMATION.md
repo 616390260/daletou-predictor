@@ -40,3 +40,12 @@ LAYA_DEVICE=cpu HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 USE_TF=0 python -m backe
 ```
 
 基座固定为 `convaiinnovations/laya-multilingual` revision `e4e9ddf21a7b1903b7acffd8814ad4307bf63a67`，下载与缓存均验证 SHA256。只在 bootstrap 阶段联网；推理使用已验证的本地文件。
+
+## 2026-10-29 上线验证
+
+- 实现提交：`860602d`，完整后端 95 项测试通过，规格与实现审查通过。
+- [首次 Linux CPU 运行 40837778281](https://github.com/616390260/daletou-predictor/actions/runs/40837778281) 成功：从冷缓存下载并验证固定基座；核对 120 期命中 1+0、未中奖；保存 124 期前瞻选择（XGBoost，02、06、12、18、23 + 10、11）。云端评分和输入摘要与独立本地 CPU 运行一致。
+- [九模型幂等试跑 40837815957](https://github.com/616390260/daletou-predictor/actions/runs/40837815957) 成功：九模型全部跳过，预测通知跳过，尾部自动 dispatch Laya。
+- [自动触发的 Laya 运行 40838275610](https://github.com/616390260/daletou-predictor/actions/runs/40838275610) 成功：检测到 124 期已有选择，跳过模型安装与推理，报告内容不变。
+- 比对上线前快照：26,406 条原预测、26,397 条原结果逐行不变；19 个模型/数据集文件摘要不变；Laya 冻结评估和旧选择不变。新报告只增加 124 期选择与 120 期核对。
+- Pages 已验证主页 124 期选择、记录页 120 期结果；375/1440 宽度无横向溢出、无页面脚本错误。121—123 未补成前瞻记录。
