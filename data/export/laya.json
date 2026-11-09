@@ -1329,6 +1329,67 @@
   },
   "decisions": [
     {
+      "issue": "26129",
+      "selected_model": "markov",
+      "label": "马尔可夫链",
+      "front": [
+        7,
+        10,
+        12,
+        14,
+        35
+      ],
+      "back": [
+        3,
+        11
+      ],
+      "score": 0.2441,
+      "model_version": "daletou-decision-v1",
+      "trained_through_issue": "26116",
+      "candidate_scores": [
+        {
+          "model": "random",
+          "score": 0.0879
+        },
+        {
+          "model": "frequency",
+          "score": 0.0758
+        },
+        {
+          "model": "bayesian",
+          "score": 0.0552
+        },
+        {
+          "model": "markov",
+          "score": 0.2441
+        },
+        {
+          "model": "xgboost",
+          "score": 0.1348
+        },
+        {
+          "model": "lstm",
+          "score": 0.0214
+        },
+        {
+          "model": "transformer",
+          "score": 0.0499
+        },
+        {
+          "model": "genetic",
+          "score": 0.0608
+        },
+        {
+          "model": "ensemble",
+          "score": 0.0659
+        }
+      ],
+      "kind": "prospective",
+      "result": null,
+      "decided_at": "2026-11-09T20:20:11.012598+00:00",
+      "source_sha256": "f102f08722054659351c4aed885404a9a04bb4b1227e1c99b86c707786525a84"
+    },
+    {
       "issue": "26128",
       "selected_model": "genetic",
       "label": "遗传算法",
@@ -1385,9 +1446,30 @@
         }
       ],
       "kind": "prospective",
-      "result": null,
+      "result": {
+        "front_hit": 0,
+        "back_hit": 1,
+        "level": null,
+        "amount": 0,
+        "amount_basis": "estimated_rule_schedule"
+      },
       "decided_at": "2026-11-07T13:50:37.575651+00:00",
-      "source_sha256": "fd6acc207a3bd8d781ab918f9b23a94dc4b09d9b97f6293c1f070c05517e85ae"
+      "source_sha256": "fd6acc207a3bd8d781ab918f9b23a94dc4b09d9b97f6293c1f070c05517e85ae",
+      "real": {
+        "front": [
+          3,
+          13,
+          20,
+          25,
+          34
+        ],
+        "back": [
+          9,
+          12
+        ],
+        "date": "2026-11-09"
+      },
+      "evaluated_at": "2026-11-09T20:19:20.069088+00:00"
     },
     {
       "issue": "26127",
@@ -2597,7 +2679,7 @@
       "trained_through_issue": "26098"
     }
   ],
-  "generated_at": "2026-11-07T13:50:37+00:00",
+  "generated_at": "2026-11-09T20:20:11+00:00",
   "active_model": {
     "version": "daletou-decision-v1",
     "model_path": "~/laya-lab/models/daletou-decision-v1",
