@@ -16,53 +16,53 @@
   "models": [
     {
       "model": "bayesian",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 5,
-      "win_rate": 0.06666666666666667,
+      "win_rate": 0.06578947368421052,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
         "hits": 52,
-        "slots": 375,
-        "observed": 0.13866666666666666,
+        "slots": 380,
+        "observed": 0.1368421052631579,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.8751666871630943,
+        "p_value": 0.7554806509279852,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
         "hits": 29,
-        "slots": 150,
-        "observed": 0.19333333333333333,
+        "slots": 152,
+        "observed": 0.19078947368421054,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.35848883472034543,
+        "p_value": 0.4238959699650629,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
         "hits": 5,
-        "slots": 75,
-        "observed": 0.06666666666666667,
+        "slots": 76,
+        "observed": 0.06578947368421052,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.999999999999971,
+        "p_value": 1.0,
         "adjusted_p_value": 1.0,
         "significant": false
       },
@@ -70,53 +70,53 @@
     },
     {
       "model": "ensemble",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 4,
-      "win_rate": 0.05333333333333334,
+      "win_rate": 0.05263157894736842,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
-        "hits": 66,
-        "slots": 375,
-        "observed": 0.176,
+        "hits": 68,
+        "slots": 380,
+        "observed": 0.17894736842105263,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.058970592322896496,
-        "adjusted_p_value": 1.0,
+        "p_value": 0.03511461753977754,
+        "adjusted_p_value": 0.8657542622900567,
         "significant": false
       },
       "back": {
         "hits": 18,
-        "slots": 150,
-        "observed": 0.12,
+        "slots": 152,
+        "observed": 0.11842105263157894,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.13424259188094584,
+        "p_value": 0.10939141017640595,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
         "hits": 4,
-        "slots": 75,
-        "observed": 0.05333333333333334,
+        "slots": 76,
+        "observed": 0.05263157894736842,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.8183885896966521,
+        "p_value": 0.8185665224331545,
         "adjusted_p_value": 1.0,
         "significant": false
       },
@@ -124,53 +124,53 @@
     },
     {
       "model": "frequency",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 4,
-      "win_rate": 0.05333333333333334,
+      "win_rate": 0.05263157894736842,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
-        "hits": 53,
-        "slots": 375,
-        "observed": 0.14133333333333334,
+        "hits": 54,
+        "slots": 380,
+        "observed": 0.14210526315789473,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "p_value": 1.0,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 20,
-        "slots": 150,
-        "observed": 0.13333333333333333,
+        "hits": 21,
+        "slots": 152,
+        "observed": 0.13815789473684212,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.30067259886015985,
+        "p_value": 0.36211835058819813,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
         "hits": 4,
-        "slots": 75,
-        "observed": 0.05333333333333334,
+        "slots": 76,
+        "observed": 0.05263157894736842,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.8183885896966521,
+        "p_value": 0.8185665224331545,
         "adjusted_p_value": 1.0,
         "significant": false
       },
@@ -178,53 +178,53 @@
     },
     {
       "model": "genetic",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 3,
-      "win_rate": 0.04,
+      "win_rate": 0.039473684210526314,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
         "hits": 58,
-        "slots": 375,
-        "observed": 0.15466666666666667,
+        "slots": 380,
+        "observed": 0.15263157894736842,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.4799518412718924,
+        "p_value": 0.5847053348607218,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 23,
-        "slots": 150,
-        "observed": 0.15333333333333332,
+        "hits": 24,
+        "slots": 152,
+        "observed": 0.15789473684210525,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.7305661070981282,
+        "p_value": 0.8201462223758264,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
         "hits": 3,
-        "slots": 75,
-        "observed": 0.04,
+        "slots": 76,
+        "observed": 0.039473684210526314,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.4880091436202515,
+        "p_value": 0.4888324165013507,
         "adjusted_p_value": 1.0,
         "significant": false
       },
@@ -232,107 +232,107 @@
     },
     {
       "model": "lstm",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 13,
-      "win_rate": 0.17333333333333334,
+      "win_rate": 0.17105263157894737,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
         "hits": 63,
-        "slots": 375,
-        "observed": 0.168,
+        "slots": 380,
+        "observed": 0.16578947368421051,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.1568690948149118,
+        "p_value": 0.18431770339310752,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
         "hits": 29,
-        "slots": 150,
-        "observed": 0.19333333333333333,
+        "slots": 152,
+        "observed": 0.19078947368421054,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.35848883472034543,
+        "p_value": 0.4238959699650629,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
         "hits": 13,
-        "slots": 75,
-        "observed": 0.17333333333333334,
+        "slots": 76,
+        "observed": 0.17105263157894737,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.0013071999111218537,
-        "adjusted_p_value": 0.0339871976891682,
+        "p_value": 0.0014818934476374132,
+        "adjusted_p_value": 0.03852922963857274,
         "significant": true
       },
-      "verdict": "中奖率高于理论随机基线（校正 p=0.034），仍需后续前瞻验证"
+      "verdict": "中奖率高于理论随机基线（校正 p=0.0385），仍需后续前瞻验证"
     },
     {
       "model": "markov",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 7,
-      "win_rate": 0.09333333333333334,
+      "win_rate": 0.09210526315789473,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
-        "hits": 59,
-        "slots": 375,
-        "observed": 0.15733333333333333,
+        "hits": 60,
+        "slots": 380,
+        "observed": 0.15789473684210525,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.3879899370049361,
+        "p_value": 0.3903837114406905,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
         "hits": 19,
-        "slots": 150,
-        "observed": 0.12666666666666668,
+        "slots": 152,
+        "observed": 0.125,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.20548734016069575,
+        "p_value": 0.17057673866916728,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
         "hits": 7,
-        "slots": 75,
-        "observed": 0.09333333333333334,
+        "slots": 76,
+        "observed": 0.09210526315789473,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.3489156818076101,
+        "p_value": 0.35368227689535914,
         "adjusted_p_value": 1.0,
         "significant": false
       },
@@ -340,161 +340,161 @@
     },
     {
       "model": "random",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 8,
-      "win_rate": 0.10666666666666667,
+      "win_rate": 0.10526315789473684,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
         "hits": 49,
-        "slots": 375,
-        "observed": 0.13066666666666665,
+        "slots": 380,
+        "observed": 0.12894736842105264,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.5296225508719437,
+        "p_value": 0.4359204401434449,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
         "hits": 40,
-        "slots": 150,
-        "observed": 0.26666666666666666,
+        "slots": 152,
+        "observed": 0.2631578947368421,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.0011615723740433406,
-        "adjusted_p_value": 0.0313624540991702,
+        "p_value": 0.0013401865139685129,
+        "adjusted_p_value": 0.03618503587714985,
         "significant": true
       },
       "win": {
         "hits": 8,
-        "slots": 75,
-        "observed": 0.10666666666666667,
+        "slots": 76,
+        "observed": 0.10526315789473684,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.1622500367011138,
+        "p_value": 0.1673492842271228,
         "adjusted_p_value": 1.0,
         "significant": false
       },
-      "verdict": "后区高于理论随机基线（校正 p=0.0314），仍需后续前瞻验证"
+      "verdict": "后区高于理论随机基线（校正 p=0.0362），仍需后续前瞻验证"
     },
     {
       "model": "transformer",
-      "issues": 75,
-      "tickets": 75,
-      "win_tickets": 9,
-      "win_rate": 0.12,
+      "issues": 76,
+      "tickets": 76,
+      "win_tickets": 10,
+      "win_rate": 0.13157894736842105,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
-        "hits": 57,
-        "slots": 375,
-        "observed": 0.152,
+        "hits": 59,
+        "slots": 380,
+        "observed": 0.15526315789473685,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.5827000484147346,
+        "p_value": 0.48223448256312423,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 30,
-        "slots": 150,
-        "observed": 0.2,
+        "hits": 31,
+        "slots": 152,
+        "observed": 0.20394736842105263,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.25119301211325207,
+        "p_value": 0.2088273199099461,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
-        "hits": 9,
-        "slots": 75,
-        "observed": 0.12,
+        "hits": 10,
+        "slots": 76,
+        "observed": 0.13157894736842105,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.09743537702945951,
-        "adjusted_p_value": 1.0,
+        "p_value": 0.03463017049160227,
+        "adjusted_p_value": 0.8657542622900567,
         "significant": false
       },
       "verdict": "多重校正后，未检测到与理论随机基线的显著差异"
     },
     {
       "model": "xgboost",
-      "issues": 75,
-      "tickets": 75,
+      "issues": 76,
+      "tickets": 76,
       "win_tickets": 7,
-      "win_rate": 0.09333333333333334,
+      "win_rate": 0.09210526315789473,
       "first_issue": "26059",
-      "last_issue": "26133",
-      "issue_set_sha256": "0401030642e901b6d958c3be98577b3e506a42b2ae50225ab2933b4c156dbf27",
+      "last_issue": "26134",
+      "issue_set_sha256": "26416cb32a7ac5f7d96a89baee2ded6a20121db0dd088b780e82905d7f37dd12",
       "front": {
-        "hits": 55,
-        "slots": 375,
-        "observed": 0.14666666666666667,
+        "hits": 56,
+        "slots": 380,
+        "observed": 0.14736842105263157,
         "theoretical": 0.14285714285714285,
         "null_interval95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
         "ci95": [
-          0.10933333333333334,
-          0.176
+          0.11052631578947368,
+          0.1763157894736842
         ],
-        "p_value": 0.8138250164276923,
+        "p_value": 0.814824831496269,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "back": {
-        "hits": 26,
-        "slots": 150,
-        "observed": 0.17333333333333334,
+        "hits": 27,
+        "slots": 152,
+        "observed": 0.17763157894736842,
         "theoretical": 0.16666666666666666,
         "null_interval95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
         "ci95": [
-          0.11333333333333333,
-          0.22666666666666666
+          0.1118421052631579,
+          0.2236842105263158
         ],
-        "p_value": 0.8183786442487999,
+        "p_value": 0.731867579542006,
         "adjusted_p_value": 1.0,
         "significant": false
       },
       "win": {
         "hits": 7,
-        "slots": 75,
-        "observed": 0.09333333333333334,
+        "slots": 76,
+        "observed": 0.09210526315789473,
         "theoretical": 0.06670476108331896,
-        "p_value": 0.3489156818076101,
+        "p_value": 0.35368227689535914,
         "adjusted_p_value": 1.0,
         "significant": false
       },
